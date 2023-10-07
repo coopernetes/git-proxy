@@ -122,6 +122,21 @@ class ActionPlugin extends ProxyPlugin {
   }
 }
 
+/**
+ * An ActionPlugin which executes a function when receiving a GraphQL API
+ * request.
+ */
+class GraphqlPlugin extends ActionPlugin {
+  /**
+   * default constructor
+   * @param {Promise<Action>} exec A Promise that returns an Action &
+   *                               executes when a push is proxied.
+   */
+  constructor(exec) {
+    super(exec);
+  }
+}
+
 const createLoader = async () => {
   // Auto-register plugins that are part of git-proxy core
   let names = [];
@@ -142,5 +157,6 @@ const createLoader = async () => {
 module.exports.defaultLoader = createLoader();
 module.exports.ProxyPlugin = ProxyPlugin;
 module.exports.ActionPlugin = ActionPlugin;
+module.exports.GraphqlPlugin = GraphqlPlugin;
 // exported for testing only
 module.exports.createLoader = createLoader;

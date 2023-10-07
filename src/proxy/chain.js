@@ -36,14 +36,29 @@ const chain = async (req) => {
     }
   } catch (e) {
     throw e;
-  } finally {
-    await proc.push.audit(req, action);
   }
+  // } finally {
+  //   await proc.push.audit(req, action);
+  // }
 
   return action;
 };
 
 const getChain = async (action) => {
+  if (action.type === 'graphql') {
+    const loader = await plugin.defaultLoader;
+    const pluginActions = loader.plugins;
+    const graphqlPlugins = [];
+    if (pluginActions.length > 0) {
+      for (const pluginAction of pluginActions) {
+        if (pluginAction instanceof plugin.GraphqlPlugin) {
+          console.log(`Inserting plugin ${pluginAction} into chain`);
+          graphqlPlugins.push(pluginAction.exec);
+        }
+      }
+    }
+    return graphqlPlugins;
+  }
   if (action.type === 'pull') return [];
   if (action.type === 'push') {
     // insert loaded plugins as actions

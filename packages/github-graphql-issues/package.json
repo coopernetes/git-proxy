@@ -1,0 +1,13 @@
+{
+  "name": "@finos/github-graphql-issues",
+  "version": "0.1.0",
+  "description": "Restrict access to GitHub issues GraphQL API calls",
+  "scripts": {
+    "test": "mocha --exit"
+  },
+  "author": "Thomas Cooper",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@finos/git-proxy": "file:../.."
+  }
+}

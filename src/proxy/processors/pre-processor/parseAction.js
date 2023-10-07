@@ -3,7 +3,7 @@ const actions = require('../../actions');
 const exec = async (req) => {
   const id = Date.now();
   const timestamp = id;
-  const repoName = getRepoNameFromUrl(req.originalUrl);
+  let repoName = getRepoNameFromUrl(req.originalUrl);
   const paths = req.originalUrl.split('/');
 
   let type = 'pull';
@@ -15,6 +15,18 @@ const exec = async (req) => {
     type = 'push';
   }
 
+  if (paths.find((s) => s.includes('graphql')) !== undefined) {
+    type = 'graphql';
+    console.log(`body: ${req.body.toString()}`);
+    const gqlBody = JSON.parse(req.body.toString());
+    if (Object.keys(gqlBody).includes('variables')) {
+      repoName = `${gqlBody.variables.owner}/${gqlBody.variables.repo}`;
+    }
+  }
+  if (paths.find((s) => s.includes('v3')) !== undefined) {
+    type = 'rest';
+    console.log(`url: ${req.originalUrl}`);
+  }
   return new actions.Action(id, type, req.method, timestamp, repoName);
 };
 
