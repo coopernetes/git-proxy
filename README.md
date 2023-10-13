@@ -45,16 +45,46 @@ Git Proxy is built with a developer-first mindset. By presenting simple-to-follo
 
 ## Installation
 
-To install Git Proxy, use the [npm](https://www.npmjs.com/) package manager:
+To install Git Proxy, you must have [Node.js 16 or later](https://nodejs.org/en/download) installed. Use [npm](https://www.npmjs.com) to install the package:
 
 ```bash
-$ npm install @finos/git-proxy
+$ npm install -g @finos/git-proxy
 ```
 
 To install a specific version of Git Proxy, append the version to the end of the `install` command:
 
 ```bash
-$ npm install @finos/git-proxy@1.0.0
+$ npm install -g @finos/git-proxy@1.1.0
+```
+
+To start the server, run `git-proxy`. Alternatively, you can also install & run git-proxy directly using `npx`:
+
+```bash
+$ git-proxy
+# Running with npx - if the package isn't already installed, npx will prompt you to confirm installation
+$ npx --package=@finos/git-proxy@1.1.0 -- git-proxy
+```
+
+## Configuration
+By default, git-proxy ships with a [default configuration](./proxy.config.json) for demonstration purposes. In most environments, this should be overridden by your user-specific values.
+
+To set your own values, create a `proxy.config.json` in the current working directory. This will be loaded when you execute `git-proxy` if present.
+
+If you wish to specify a different file location to use as configuration, use the `-c/--config` command-line argument:
+
+```bash
+$ git-proxy --config /etc/gitproxy/config.json
+# With npx
+$ npx -- @finos/git-proxy --config /etc/gitproxy/config.json
+```
+
+### Validation
+To validate your configuration against the [included schema](config.schema.json), use the following included script:
+
+```bash
+$ git-proxy --validate
+# Run validation against a configuration at a custom file location
+$ git-proxy --validate --config /etc/gitproxy/config.json
 ```
 
 ## Contributing
