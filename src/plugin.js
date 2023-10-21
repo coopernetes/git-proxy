@@ -1,4 +1,5 @@
 const path = require('path');
+
 const lpModule = import('load-plugin');
 ('use strict');
 
