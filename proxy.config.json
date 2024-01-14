@@ -6,18 +6,36 @@
   },
   "authorisedList": [
     {
-      "project": "finos",
-      "name": "git-proxy",
-      "url": "https://github.com/finos/git-proxy.git"
+      "project": "coopernetes",
+      "name": "backstage",
+      "url": "https://github.com/coopernetes/backstage.git"
     }
   ],
+  "commitConfig": {
+    "message": {
+      "block": {
+        "literals": ["foo"],
+        "patterns": ["bar"]
+      }
+    },
+    "author": {
+      "email": {
+        "domain": {
+          "allow": ".*"
+        },
+        "local": {
+          "block": "foo"
+        }
+      }
+    }
+  },
   "sink": [
     {
       "type": "fs",
       "params": {
         "filepath": "./."
       },
-      "enabled": true
+      "enabled": false
     },
     {
       "type": "mongo",
@@ -25,7 +43,7 @@
       "options": {        
         "useUnifiedTopology": true
       },      
-      "enabled": false
+      "enabled": true
     }
   ],
   "authentication": [

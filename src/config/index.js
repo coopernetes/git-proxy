@@ -71,7 +71,37 @@ const logConfiguration = () => {
 };
 
 // logConfiguration();
-
+module.exports = {
+  getCommitConfig : () => {
+    return defaultSettings.commitConfig;
+  },
+  getPrivateOrganizations : () => {
+    return defaultSettings.privateOrganizations;
+  },
+  getAuthorisedList,
+  getDatabase,
+  logConfiguration,
+  getAuthentication,
+  getTempPasswordConfig,
+  getAllowSelfSignedCert : () => {
+    return true;
+  },
+  getProxyUrl : () => {
+    if (defaultSettings.proxyUrl) {
+      return defaultSettings.proxyUrl;
+    }
+    return 'https://github.com'
+  },
+  getCookieSecret : () => {
+    if (defaultSettings.cookieSecret) {
+      return defaultSettings.cookieSecret;
+    }
+    return 'secret';
+  },
+  getSessionMaxAgeHours : () => {
+    return 24;
+  },
+}
 exports.getAuthorisedList = getAuthorisedList;
 exports.getDatabase = getDatabase;
 exports.logConfiguration = logConfiguration;

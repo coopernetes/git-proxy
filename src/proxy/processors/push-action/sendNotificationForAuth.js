@@ -1,5 +1,6 @@
 const Step = require('../../actions').Step;
-const emailSender = require('../../../service/emailSender');
+const emailSender = (toAddress, subject, body) => {
+};
 const db = require('../../../db');
 
 const exec = async (req, action) => {
@@ -31,7 +32,7 @@ const exec = async (req, action) => {
         `${req.hostname}/requests/${action.id}</a></p>`;
 
       emailBody += `<p>Please approve.</p><p>Thank you,</p><p>Git Proxy Team.</p>`;
-      emailSender.sendEmail(toAddress, 'GITProxy:Push Request Approval', emailBody);
+      emailSender(toAddress, 'GITProxy:Push Request Approval', emailBody);
     } else {
       console.log(`NO Auth User assign to Repo`);
     }

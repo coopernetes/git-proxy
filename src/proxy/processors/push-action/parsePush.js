@@ -29,7 +29,7 @@ const exec = async (req, action) => {
     }
 
     const user = action.commitData[action.commitData.length - 1].committer;
-    console.log(`Push Request recevied from user ${user}`);
+    console.log(`Push Request received from user ${user}`);
     action.user = user;
 
     step.content = {
@@ -91,10 +91,10 @@ const getCommitData = (contents) => {
         .join(' ');
       console.log({ message });
 
-      const commitTimestamp = committer.split(' ')[2];
+      const commitTimestamp = committer.split(' ')[3];
       console.log({ commitTimestamp });
 
-      const authorEmail = author.split(' ')[1].slice(1, -1);
+      const authorEmail = author.substring(author.indexOf('<')+1, author.indexOf('>'));
       console.log({ authorEmail });
 
       console.log({
@@ -110,8 +110,8 @@ const getCommitData = (contents) => {
       return {
         tree,
         parent,
-        author: author.split(' ')[0],
-        committer: committer.split(' ')[0],
+        author: author.split('<')[0].trim(),
+        committer: committer.split('<')[0].trim(),
         commitTimestamp,
         message,
         authorEmail,
