@@ -1,0 +1,22 @@
+{
+  "name": "@finos/git-proxy-core",
+  "version": "0.0.1",
+  "description": "Core libraries of git-proxy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/finos/git-proxy.git"
+  },
+  "author": "Thomas Cooper",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/finos/git-proxy/issues"
+  },
+  "homepage": "https://github.com/finos/git-proxy#readme",
+  "dependencies": {
+    "axios": "^1.6.7"
+  }
+}
