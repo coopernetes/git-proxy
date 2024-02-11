@@ -1,0 +1,12 @@
+extensions:
+  - "ts"
+project: "./tsconfig.json"
+spec:
+  - "./**/*.test.ts"
+require:
+  - "ts-node/register"
+  - "tsconfig-paths/register"
+reporter: "dot"
+node-option:
+  - "experimental-specifier-resolution=node"
+  - "loader=ts-node/esm"
