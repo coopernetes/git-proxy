@@ -1,7 +1,7 @@
 module.exports = {
   settings: {
     react: {
-      version: 'detect',
+      version: '16',
     },
   },
   env: {
@@ -11,7 +11,7 @@ module.exports = {
     node: true,
   },
   extends: ['plugin:react/recommended', 'prettier', 'google'],
-  parser: '@babel/eslint-parser',
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -23,7 +23,7 @@ module.exports = {
     sourceType: 'module',
     requireConfigFile: false,
   },
-  plugins: ['prettier', 'react'],
+  plugins: ['@typescript-eslint', 'prettier', 'react'],
   rules: {
     'prettier/prettier': ['error', { singleQuote: true }],
     'object-curly-spacing': ['error', 'always'],
