@@ -1,17 +1,37 @@
 {
   "include": [
+    "apps/*/src",
     "packages/*/src",
     "plugins/*/src"
   ],
+  "exclude": [
+    "node_modules",
+    "apps/*/dist",
+    "packages/*/dist",
+    "plugins/*/dist"
+  ],
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "build/",
+    "rootDir": ".",
+    "useUnknownInCatchVariables": false,
     "target": "ES2021",
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "esModuleInterop": true,
+    "noEmit": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "forceConsistentCasingInFileNames": true,
     "pretty": true,
     "strict": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
     "skipLibCheck": true
   }
 }
