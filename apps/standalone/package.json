@@ -1,0 +1,20 @@
+{
+  "name": "@finos/git-proxy-standalone",
+  "description": "A standalone version of the git-proxy that runs the proxy server",
+  "version": "0.0.0",
+  "packageManager": "yarn@4.1.0",
+  "author": "Thomas Cooper",
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@finos/git-proxy-server": "workspace:^",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/yargs": "^17.0.32",
+    "typescript": "^5.3.3"
+  }
+}
