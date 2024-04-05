@@ -293,7 +293,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@finos/git-proxy-httpserver@workspace:^, @finos/git-proxy-httpserver@workspace:packages/httpserver":
+"@finos/git-proxy-httpserver@workspace:*, @finos/git-proxy-httpserver@workspace:packages/httpserver":
   version: 0.0.0-use.local
   resolution: "@finos/git-proxy-httpserver@workspace:packages/httpserver"
   dependencies:
@@ -309,7 +309,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@finos/git-proxy-standalone@workspace:apps/standalone"
   dependencies:
-    "@finos/git-proxy-httpserver": "workspace:^"
+    "@finos/git-proxy-httpserver": "workspace:*"
     "@types/yargs": "npm:^17.0.32"
     typescript: "npm:^5.3.3"
     yargs: "npm:^17.7.2"
