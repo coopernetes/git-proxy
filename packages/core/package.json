@@ -1,7 +1,7 @@
 {
-  "name": "@finos/git-proxy-core",
+  "name": "@finos/git-proxy-common",
   "version": "0.0.0",
-  "description": "Core libraries of git-proxy",
+  "description": "Common libraries of git-proxy",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/finos/git-proxy.git"
@@ -12,13 +12,5 @@
   "homepage": "https://git-proxy.finos.org/",
   "author": "Thomas Cooper",
   "license": "Apache-2.0",
-  "packageManager": "yarn@4.1.0",
-  "dependencies": {
-    "@types/express": "^4.17.21",
-    "axios": "^1.6.7",
-    "uuid": "^9.0.1"
-  },
-  "devDependencies": {
-    "@types/uuid": "^9"
-  }
+  "packageManager": "yarn@4.1.0"
 }

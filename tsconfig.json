@@ -1,37 +1,22 @@
 {
+  "compilerOptions": {
+    "target": "ES5", // For maximum compatibility
+    "module": "CommonJS", // Node.js uses CommonJS
+    "allowJs": true, // Allows JavaScript files to be compiled
+    "declaration": true, // Generates declaration files for your packages
+    "outDir": "./dist", // Output directory for compiled files
+    "strict": true, // Enables all strict type-checking options
+    "esModuleInterop": true, // Enables CommonJS/AMD/UMD modules to be imported as ES6 modules
+    "skipLibCheck": true, // Skips type checking of declaration files
+    "forceConsistentCasingInFileNames": true // Disallows inconsistently-cased references to the same file
+  },
   "include": [
-    "apps/*/src",
-    "packages/*/src",
-    "plugins/*/src"
+    "apps/*/src", // Includes all source files in apps directory
+    "packages/*/src" // Includes all source files in packages directory
   ],
   "exclude": [
-    "node_modules",
-    "apps/*/dist",
-    "packages/*/dist",
-    "plugins/*/dist"
-  ],
-  "compilerOptions": {
-    "outDir": "build/",
-    "rootDir": ".",
-    "useUnknownInCatchVariables": false,
-    "target": "ES2021",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "noEmit": false,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "forceConsistentCasingInFileNames": true,
-    "pretty": true,
-    "strict": true,
-    "strictBindCallApply": true,
-    "strictFunctionTypes": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": true,
-    "skipLibCheck": true
-  }
+    "node_modules", // Excludes node_modules directory
+    "apps/*/dist", // Excludes all dist directories in apps
+    "packages/*/dist" // Excludes all dist directories in packages
+  ]
 }

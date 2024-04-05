@@ -275,36 +275,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@finos/git-proxy-core@workspace:packages/core":
+"@finos/git-proxy-common@workspace:*, @finos/git-proxy-common@workspace:packages/core":
   version: 0.0.0-use.local
-  resolution: "@finos/git-proxy-core@workspace:packages/core"
-  dependencies:
-    "@types/express": "npm:^4.17.21"
-    "@types/uuid": "npm:^9"
-    axios: "npm:^1.6.7"
-    uuid: "npm:^9.0.1"
+  resolution: "@finos/git-proxy-common@workspace:packages/core"
   languageName: unknown
   linkType: soft
 
-"@finos/git-proxy-server@workspace:^, @finos/git-proxy-server@workspace:packages/server":
+"@finos/git-proxy-httpserver@workspace:packages/httpserver":
   version: 0.0.0-use.local
-  resolution: "@finos/git-proxy-server@workspace:packages/server"
+  resolution: "@finos/git-proxy-httpserver@workspace:packages/httpserver"
   dependencies:
+    "@finos/git-proxy-common": "workspace:*"
     "@types/express": "npm:^4"
     "@types/express-http-proxy": "npm:^1.6.6"
     express: "npm:^4.18.3"
     express-http-proxy: "npm:^2.0.0"
-  languageName: unknown
-  linkType: soft
-
-"@finos/git-proxy-standalone@workspace:apps/standalone":
-  version: 0.0.0-use.local
-  resolution: "@finos/git-proxy-standalone@workspace:apps/standalone"
-  dependencies:
-    "@finos/git-proxy-server": "workspace:^"
-    "@types/yargs": "npm:^17.0.32"
-    typescript: "npm:^5.3.3"
-    yargs: "npm:^17.7.2"
   languageName: unknown
   linkType: soft
 
@@ -336,7 +321,7 @@ __metadata:
     tsconfig-paths: "npm:^4.2.0"
     typescript: "npm:^5.3.3"
   bin:
-    git-proxy: ./index.mjs
+    git-proxy: ./index.js
   languageName: unknown
   linkType: soft
 
@@ -506,7 +491,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:*, @types/express@npm:^4, @types/express@npm:^4.17.21":
+"@types/express@npm:*, @types/express@npm:^4":
   version: 4.17.21
   resolution: "@types/express@npm:4.17.21"
   dependencies:
@@ -651,29 +636,6 @@ __metadata:
   version: 4.0.5
   resolution: "@types/tough-cookie@npm:4.0.5"
   checksum: 10c0/68c6921721a3dcb40451543db2174a145ef915bc8bcbe7ad4e59194a0238e776e782b896c7a59f4b93ac6acefca9161fccb31d1ce3b3445cb6faa467297fb473
-  languageName: node
-  linkType: hard
-
-"@types/uuid@npm:^9":
-  version: 9.0.8
-  resolution: "@types/uuid@npm:9.0.8"
-  checksum: 10c0/b411b93054cb1d4361919579ef3508a1f12bf15b5fdd97337d3d351bece6c921b52b6daeef89b62340fd73fd60da407878432a1af777f40648cbe53a01723489
-  languageName: node
-  linkType: hard
-
-"@types/yargs-parser@npm:*":
-  version: 21.0.3
-  resolution: "@types/yargs-parser@npm:21.0.3"
-  checksum: 10c0/e71c3bd9d0b73ca82e10bee2064c384ab70f61034bbfb78e74f5206283fc16a6d85267b606b5c22cb2a3338373586786fed595b2009825d6a9115afba36560a0
-  languageName: node
-  linkType: hard
-
-"@types/yargs@npm:^17.0.32":
-  version: 17.0.32
-  resolution: "@types/yargs@npm:17.0.32"
-  dependencies:
-    "@types/yargs-parser": "npm:*"
-  checksum: 10c0/2095e8aad8a4e66b86147415364266b8d607a3b95b4239623423efd7e29df93ba81bb862784a6e08664f645cc1981b25fd598f532019174cd3e5e1e689e1cccf
   languageName: node
   linkType: hard
 
@@ -1084,17 +1046,6 @@ __metadata:
   version: 1.0.6
   resolution: "available-typed-arrays@npm:1.0.6"
   checksum: 10c0/e427360e68ccb19fa0ea48421f393ef3f3d2c9c561f6a8a0704ff472d58024be3e4101f00565445ba453de723a76f4a650defbacaea663c3fb3be8b8f842e955
-  languageName: node
-  linkType: hard
-
-"axios@npm:^1.6.7":
-  version: 1.6.7
-  resolution: "axios@npm:1.6.7"
-  dependencies:
-    follow-redirects: "npm:^1.15.4"
-    form-data: "npm:^4.0.0"
-    proxy-from-env: "npm:^1.1.0"
-  checksum: 10c0/131bf8e62eee48ca4bd84e6101f211961bf6a21a33b95e5dfb3983d5a2fe50d9fffde0b57668d7ce6f65063d3dc10f2212cbcb554f75cfca99da1c73b210358d
   languageName: node
   linkType: hard
 
@@ -2274,16 +2225,6 @@ __metadata:
   version: 3.2.9
   resolution: "flatted@npm:3.2.9"
   checksum: 10c0/5c91c5a0a21bbc0b07b272231e5b4efe6b822bcb4ad317caf6bb06984be4042a9e9045026307da0fdb4583f1f545e317a67ef1231a59e71f7fced3cc429cfc53
-  languageName: node
-  linkType: hard
-
-"follow-redirects@npm:^1.15.4":
-  version: 1.15.5
-  resolution: "follow-redirects@npm:1.15.5"
-  peerDependenciesMeta:
-    debug:
-      optional: true
-  checksum: 10c0/418d71688ceaf109dfd6f85f747a0c75de30afe43a294caa211def77f02ef19865b547dfb73fde82b751e1cc507c06c754120b848fe5a7400b0a669766df7615
   languageName: node
   linkType: hard
 
@@ -4236,13 +4177,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proxy-from-env@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "proxy-from-env@npm:1.1.0"
-  checksum: 10c0/fe7dd8b1bdbbbea18d1459107729c3e4a2243ca870d26d34c2c1bcd3e4425b7bcc5112362df2d93cc7fb9746f6142b5e272fd1cc5c86ddf8580175186f6ad42b
-  languageName: node
-  linkType: hard
-
 "psl@npm:^1.1.33":
   version: 1.9.0
   resolution: "psl@npm:1.9.0"
@@ -5352,15 +5286,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^9.0.1":
-  version: 9.0.1
-  resolution: "uuid@npm:9.0.1"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 10c0/1607dd32ac7fc22f2d8f77051e6a64845c9bce5cd3dd8aa0070c074ec73e666a1f63c7b4e0f4bf2bc8b9d59dc85a15e17807446d9d2b17c8485fbc2147b27f9b
-  languageName: node
-  linkType: hard
-
 "validate-npm-package-license@npm:^3.0.1":
   version: 3.0.4
   resolution: "validate-npm-package-license@npm:3.0.4"
@@ -5627,7 +5552,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:^17.0.0, yargs@npm:^17.7.2":
+"yargs@npm:^17.0.0":
   version: 17.7.2
   resolution: "yargs@npm:17.7.2"
   dependencies:

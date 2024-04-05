@@ -1,11 +1,11 @@
 {
   "name": "@finos/git-proxy",
-  "version": "2.0.0",
+  "version": "2.0.0-alpha",
   "description": "Deploy custom push protections and policies on top of Git.",
   "author": "Paul Groves",
   "license": "Apache-2.0",
   "scripts": {
-    "start": "node index.mjs",
+    "start": "node index.js",
     "test": "cross-env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'",
     "test:coverage": "nyc npm run test",
     "prepare": "node ./scripts/prepare.js",
@@ -13,11 +13,10 @@
   },
   "private": true,
   "packageManager": "yarn@4.1.0",
-  "bin": "./index.mjs",
+  "bin": "./index.js",
   "engines": {
     "node": "20"
   },
-  "type": "module",
   "workspaces": [
     "apps/*",
     "packages/*",
