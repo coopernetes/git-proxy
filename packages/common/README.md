@@ -1,5 +1,5 @@
-# git-proxy-core
-This package comprises the core libraries used for Git Proxy services. This includes libraries
+# git-proxy-common
+This package comprises the common libraries used for Git Proxy services. This includes libraries
 for parsing git data for a checked out repository, filters for git actions as well as the main
 policy manager functionality.
 
