@@ -1,5 +1,5 @@
 {
-  "name": "@finos/git-proxy-server",
+  "name": "@finos/git-proxy-httpserver",
   "version": "0.0.0",
   "description": "Git Proxy server that intercepts git requests over HTTP",
   "repository": {
@@ -14,6 +14,7 @@
   "license": "Apache-2.0",
   "packageManager": "yarn@4.1.0",
   "dependencies": {
+    "@finos/git-proxy-common": "workspace:*",
     "express": "^4.18.3",
     "express-http-proxy": "^2.0.0"
   },
