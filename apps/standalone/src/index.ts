@@ -1,4 +1,4 @@
-import { ProxyServer } from '@finos/git-proxy-server/src/http/server';
+import { start } from '@finos/git-proxy-httpserver';
 import yargs from 'yargs';
 
 const argv = yargs(process.argv.slice(2))
@@ -12,7 +12,12 @@ const argv = yargs(process.argv.slice(2))
   .parseSync();
 
 if (argv.http) {
-  const server = new ProxyServer('https://github.com', '/github', 8081);
-  server.configure();
-  server.start();
+  start().then(
+    () => {
+      console.log('Server started');
+    },
+    (err: Error) => {
+      console.error(err);
+    },
+  );
 }

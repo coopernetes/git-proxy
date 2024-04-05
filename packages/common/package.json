@@ -12,5 +12,13 @@
   "homepage": "https://git-proxy.finos.org/",
   "author": "Thomas Cooper",
   "license": "Apache-2.0",
-  "packageManager": "yarn@4.1.0"
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "packageManager": "yarn@4.1.0",
+  "dependencies": {
+    "@seald-io/nedb": "^4.0.4",
+    "load-plugin": "^6.0.2"
+  }
 }

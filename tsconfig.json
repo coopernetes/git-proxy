@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES5", // For maximum compatibility
-    "module": "CommonJS", // Node.js uses CommonJS
+    "target": "ES2022", // For maximum compatibility
+    "module": "Node16", // Node.js uses CommonJS
+    "moduleResolution": "Node16", // Resolves modules using Node.js module resolution strategy
     "allowJs": true, // Allows JavaScript files to be compiled
     "declaration": true, // Generates declaration files for your packages
     "outDir": "./dist", // Output directory for compiled files
