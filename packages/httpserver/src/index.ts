@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const router = require('./routes').router;
 const config = require('@finos/git-proxy-common/src/config');
 const sink = require('@finos/git-proxy-common/src/db');
-const { GIT_PROXY_SERVER_PORT: proxyHttpPort } = require('../config/env').Vars;
+const { GIT_PROXY_SERVER_PORT: proxyHttpPort } = require('@finos/git-proxy-common/src/config/env').Vars;
 
 const options = {
   inflate: true,
