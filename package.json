@@ -21,6 +21,11 @@
     "format": "prettier --write src/**/*.{js,jsx,ts,tsx,css,md,json,scss} test/**/*.{js,jsx,ts,tsx,json} --config ./.prettierrc",
     "g:tsc": "cd $INIT_CWD && tsc --build"
   },
+  "husky": {
+    "hooks": {
+      "commit-msg": "yarn commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
   "private": true,
   "packageManager": "yarn@4.2.2",
   "bin": {
@@ -97,7 +102,7 @@
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-standard": "^5.0.0",
-    "husky": "^9.0.10",
+    "husky": "^9.0.11",
     "jsdom": "^24.0.0",
     "jsdom-global": "^3.0.2",
     "mocha": "^10.3.0",
