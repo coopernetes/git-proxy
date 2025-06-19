@@ -1,8 +1,14 @@
 package org.finos.gitproxy.servlet.filter;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.io.IOException;
 import java.util.Set;
 import java.util.function.Predicate;
+
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.finos.gitproxy.git.HttpOperation;

@@ -31,10 +31,10 @@ public class AuditLogFilter extends AbstractGitProxyFilter implements AuditFilte
     }
 
     @Override
-    public void doHttpFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+    public void doHttpFilter(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
         // First execute the rest of the filter chain
-        chain.doFilter(request, response);
+//        chain.doFilter(request, response);
 
         // Then perform the audit logging
         audit("" + request.getAttribute(GIT_REQUEST_ATTRIBUTE));

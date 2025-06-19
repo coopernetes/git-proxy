@@ -3,7 +3,7 @@ package org.finos.gitproxy.servlet;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.finos.gitproxy.config.GitProxyProperties;
+import spring.config.GitProxyProperties;
 import org.finos.gitproxy.provider.GitProxyProvider;
 import org.finos.gitproxy.provider.ProviderRepository;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;

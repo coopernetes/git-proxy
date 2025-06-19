@@ -24,7 +24,7 @@ import org.finos.gitproxy.provider.ProviderConfiguration;
  * <pre>
  *     Git HTTP client initiates request to {applicationUrl}/{providerHostname}/{providerPath...}
  *     -> Find Filter instances that match hostname of {@link AbstractGitProxyProvider#getUri()}
- *     -> Execute {@link #doHttpFilter(HttpServletRequest, HttpServletResponse, FilterChain)}
+ *     -> Execute {@link #doHttpFilter(HttpServletRequest, HttpServletResponse)}
  * </pre>
  *
  * <p>The <a href="https://git-scm.com/docs/http-protocol">Git http protocol is stateless</a> and therefore each

@@ -3,7 +3,7 @@ package org.finos.gitproxy.provider;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.finos.gitproxy.config.GitProxyProperties;
+import spring.config.GitProxyProperties;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;

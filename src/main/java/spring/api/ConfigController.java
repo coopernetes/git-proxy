@@ -1,7 +1,7 @@
-package org.finos.gitproxy.api;
+package spring.api;
 
 import lombok.RequiredArgsConstructor;
-import org.finos.gitproxy.config.LegacyJSONConfiguration;
+import spring.config.LegacyJSONConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

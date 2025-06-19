@@ -1,22 +1,25 @@
 package org.finos.gitproxy.servlet.filter;
 
-import static org.finos.gitproxy.servlet.GitProxyProviderServlet.GIT_REQUEST_ATTRIBUTE;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.transport.PacketLineIn;
-import org.finos.gitproxy.git.*;
+import org.finos.gitproxy.git.GitReceivePackParser;
+import org.finos.gitproxy.git.GitRequestDetails;
+import org.finos.gitproxy.git.HttpOperation;
 import org.finos.gitproxy.provider.GitProxyProvider;
 import org.finos.gitproxy.servlet.RequestBodyWrapper;
 import org.springframework.core.Ordered;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Set;
+import java.util.UUID;
+
+import static org.finos.gitproxy.servlet.GitProxyProviderServlet.GIT_REQUEST_ATTRIBUTE;
 
 /**
  * Filter that extracts details about a git request and adds them to the request attributes. This filter is used to
@@ -33,12 +36,12 @@ public class ParseRequestFilter extends AbstractProviderAwareGitProxyFilter impl
     }
 
     @Override
-    public void doHttpFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    public void doHttpFilter(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         var wrapper = new RequestBodyWrapper(request);
-        var pushRequest = parse(wrapper);
-        request.setAttribute(GIT_REQUEST_ATTRIBUTE, pushRequest);
-        chain.doFilter(wrapper, response);
+        var requestDetails = parse(wrapper);
+        requestDetails.setResult(GitRequestDetails.GitResult.ALLOWED); //TODO: Remove after remaining filtering is implemented
+        request.setAttribute(GIT_REQUEST_ATTRIBUTE, requestDetails);
     }
 
     /**
@@ -101,7 +104,7 @@ public class ParseRequestFilter extends AbstractProviderAwareGitProxyFilter impl
 
     private void logPushDetails(UUID id, String packetLine, byte[] packData) {
         try {
-            Files.write(Path.of("packetline-" + id + ".txt"), packetLine.getBytes(StandardCharsets.UTF_8));
+            Files.writeString(Path.of("packetline-" + id + ".txt"), packetLine);
             Files.write(Path.of("body-" + id + ".txt"), packData);
         } catch (IOException e) {
             log.error("Error writing debug files", e);

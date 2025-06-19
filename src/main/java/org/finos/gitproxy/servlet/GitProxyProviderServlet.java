@@ -4,6 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpRequest;
@@ -11,6 +12,7 @@ import org.apache.http.HttpResponse;
 import org.finos.gitproxy.git.GitRequestDetails;
 import org.finos.gitproxy.provider.GitProxyProvider;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
+import org.springframework.web.util.ContentCachingResponseWrapper;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,6 +40,8 @@ public class GitProxyProviderServlet extends ProxyServlet {
         var canProxy = details != null && details.getResult() == GitRequestDetails.GitResult.ALLOWED;
         if (!servletResponse.isCommitted() && canProxy) {
             super.service(servletRequest, servletResponse);
+            var wrapper = new ContentCachingResponseWrapper(servletResponse);
+            System.out.println("response: " + new String(wrapper.getContentAsByteArray()));
         }
     }
 
