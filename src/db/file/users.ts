@@ -20,7 +20,13 @@ if (config.getDatabase().type === 'fs') {
   initializeFileDatabase();
 }
 
-const db = new Datastore({ filename: './.data/db/users.db', autoload: true });
+// export for testing purposes
+export let db: Datastore;
+if (process.env.NODE_ENV === 'test') {
+  db = new Datastore({ inMemoryOnly: true, autoload: true });
+} else {
+  db = new Datastore({ filename: './.data/db/users.db', autoload: true });
+}
 
 // Using a unique constraint with the index
 try {

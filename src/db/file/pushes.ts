@@ -22,7 +22,13 @@ if (config.getDatabase().type === 'fs') {
   initializeFileDatabase();
 }
 
-const db = new Datastore({ filename: './.data/db/pushes.db', autoload: true });
+// export for testing purposes
+export let db: Datastore;
+if (process.env.NODE_ENV === 'test') {
+  db = new Datastore({ inMemoryOnly: true, autoload: true });
+} else {
+  db = new Datastore({ filename: './.data/db/pushes.db', autoload: true });
+}
 try {
   db.ensureIndex({ fieldName: 'id', unique: true });
 } catch (e) {
