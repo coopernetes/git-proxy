@@ -40,6 +40,8 @@
 
 ## What is GitProxy
 
+> **v3 skeleton branch.** This branch holds a non-functional sketch of a proposed 3.0 architecture: module boundaries, types and contracts with no implementations. Start at [website/docs/v3/index.md](website/docs/v3/index.md). The description below is of the 2.x release.
+
 GitProxy is an application that stands between developers and a Git remote endpoint (e.g., `github.com`). It applies rules and workflows (configurable as `plugins`) to all outgoing `git push` operations to ensure they are compliant. GitProxy supports both **HTTP/HTTPS** and **SSH** protocols with identical security scanning and validation.
 
 The main goal of GitProxy is to marry the defacto standard Open Source developer experience (git-based workflow of branching out, submitting changes and merging back) with security and legal requirements that firms have to comply with, when operating in highly regulated industries like financial services.
