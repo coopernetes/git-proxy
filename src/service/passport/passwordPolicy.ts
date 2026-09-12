@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-import { RequestHandler } from 'express';
-import { mustChangePassword } from './passwordPolicy';
+/**
+ * Password-change gating for local authentication. Reads the local
+ * credential record, not the user, since the user record carries no secret.
+ */
 
-export const passwordChangeHandler: RequestHandler = (req, res, next) => {
-  if (mustChangePassword(req.user)) {
-    return res.status(428).send({
-      message: 'Password change required before accessing this endpoint',
-    });
-  }
-  return next();
-};
+import { User } from '../../domain';
+
+export declare function mustChangePassword(user: User | undefined | Express.User): boolean;

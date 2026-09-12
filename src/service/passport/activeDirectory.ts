@@ -20,7 +20,8 @@ import ActiveDirectory from 'activedirectory2';
 import { Request } from 'express';
 
 import * as ldaphelper from './ldaphelper';
-import * as db from '../../db';
+import type { User } from '../../domain';
+import { getUserStore } from '../../store';
 import { getAuthMethods } from '../../config';
 import { ADProfile } from './types';
 import { handleErrorAndLog } from '../../utils/errors';
@@ -102,15 +103,16 @@ export const configure = async (passport: PassportStatic): Promise<PassportStati
           profile.admin = isAdmin;
           console.log(`passport.activeDirectory: ${profile.username} admin=${isAdmin}`);
 
-          const user = {
-            username: profile.username,
-            admin: isAdmin,
+          // 2.x mapping: `admin` boolean becomes a persisted role; the AD mail
+          // attribute becomes the IdP-sourced email. Roles are stored as
+          // granted on login and consumed as data thereafter.
+          const user = await getUserStore().upsertFromIdp({
+            username: profile.username!,
+            idpSubject: profile._json.userPrincipalName ?? profile.username!,
             email: profile._json.mail,
             displayName: profile.displayName,
-            title: profile._json.title,
-          };
-
-          await db.updateUser(user);
+            roles: isAdmin ? ['user', 'admin'] : ['user'],
+          });
 
           return done(null, user);
         } catch (error: unknown) {
@@ -122,15 +124,15 @@ export const configure = async (passport: PassportStatic): Promise<PassportStati
   );
 
   passport.serializeUser(function (
-    user: Partial<db.User>,
-    done: (err: unknown, user: Partial<db.User>) => void,
+    user: Partial<User>,
+    done: (err: unknown, user: Partial<User>) => void,
   ) {
     done(null, user);
   });
 
   passport.deserializeUser(function (
-    user: Partial<db.User>,
-    done: (err: unknown, user: Partial<db.User>) => void,
+    user: Partial<User>,
+    done: (err: unknown, user: Partial<User>) => void,
   ) {
     done(null, user);
   });

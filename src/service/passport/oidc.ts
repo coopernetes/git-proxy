@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import * as db from '../../db';
+import type { User } from '../../domain';
+import { getUserStore } from '../../store';
 import { PassportStatic } from 'passport';
 import { getAuthMethods } from '../../config';
 import type { UserInfoResponse } from 'openid-client';
@@ -50,7 +51,7 @@ export const configure = async (passport: PassportStatic): Promise<PassportStati
   try {
     const strategy = new Strategy(
       { callbackURL, config, scope },
-      async (tokenSet: any, done: (err: unknown, user?: Partial<db.User>) => void) => {
+      async (tokenSet: any, done: (err: unknown, user?: Partial<User>) => void) => {
         const idTokenClaims = tokenSet.claims();
         const expectedSub = idTokenClaims.sub;
         const userInfo = await fetchUserInfo(config, tokenSet.access_token, expectedSub);
@@ -68,13 +69,13 @@ export const configure = async (passport: PassportStatic): Promise<PassportStati
 
     passport.use(type, strategy);
 
-    passport.serializeUser((user: Partial<db.User>, done) => {
-      done(null, user.oidcId || user.username);
+    passport.serializeUser((user: Partial<User>, done) => {
+      done(null, user.idpSubject || user.username);
     });
 
     passport.deserializeUser(async (id: string, done) => {
       try {
-        const user = await db.findUserByOIDC(id);
+        const user = await getUserStore().byIdpSubject(id);
         done(null, user);
       } catch (error: unknown) {
         done(error);
@@ -96,22 +97,24 @@ export const configure = async (passport: PassportStatic): Promise<PassportStati
  */
 export const handleUserAuthentication = async (
   userInfo: UserInfoResponse,
-  done: (err: unknown, user?: Partial<db.User>) => void,
+  done: (err: unknown, user?: Partial<User>) => void,
 ): Promise<void> => {
   try {
-    const user = await db.findUserByOIDC(userInfo.sub);
+    const user = await getUserStore().byIdpSubject(userInfo.sub);
 
     if (!user) {
       const email = safelyExtractEmail(userInfo);
       if (!email) return done(new Error('No email found in OIDC profile'));
 
-      const newUser = {
+      // 2.x mapping: `oidcId` becomes `idpSubject`; the placeholder
+      // `gitAccount` is gone, identities arrive by resolution or linking;
+      // no admin flag, roles come from the IdP claim mapping.
+      const newUser = await getUserStore().upsertFromIdp({
         username: getUsername(email),
+        idpSubject: userInfo.sub,
         email,
-        oidcId: userInfo.sub,
-      };
-
-      await db.createUser(newUser.username, '', newUser.email, 'Edit me', false, newUser.oidcId);
+        roles: ['user'],
+      });
       return done(null, newUser);
     }
 

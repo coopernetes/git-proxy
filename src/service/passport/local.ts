@@ -17,7 +17,8 @@
 import bcrypt from 'bcryptjs';
 import { IVerifyOptions, Strategy as LocalStrategy } from 'passport-local';
 import type { PassportStatic } from 'passport';
-import * as db from '../../db';
+import type { User } from '../../domain';
+import { getStores, getUserStore } from '../../store';
 import type { DefaultLocalUser } from './types';
 export const type = 'local';
 
@@ -46,9 +47,8 @@ const isKnownDefaultCredentialAttempt = (username: string, password: string): bo
       defaultUser.password === password,
   );
 
-// Dynamic import to always get the current db module instance
-// This is necessary for test environments where modules may be reset
-const getDb = () => import('../../db/index.js');
+// The password hash lives in the local credential store, not on the user:
+// the v3 user record carries no secret material.
 
 export const configure = async (passport: PassportStatic): Promise<PassportStatic> => {
   passport.use(
@@ -56,16 +56,16 @@ export const configure = async (passport: PassportStatic): Promise<PassportStati
       async (
         username: string,
         password: string,
-        done: (err: unknown, user?: Partial<db.User>, info?: IVerifyOptions) => void,
+        done: (err: unknown, user?: Partial<User>, info?: IVerifyOptions) => void,
       ) => {
         try {
-          const dbModule = await getDb();
-          const user = await dbModule.findUser(username);
+          const user = await getUserStore().byUsername(username);
           if (!user) {
             return done(null, undefined, { message: 'Incorrect username.' });
           }
 
-          const passwordCorrect = await bcrypt.compare(password, user.password ?? '');
+          const credential = await getStores().localCredentials.byUserId(user.id);
+          const passwordCorrect = await bcrypt.compare(password, credential?.passwordHash ?? '');
           if (!passwordCorrect) {
             return done(null, undefined, { message: 'Incorrect password.' });
           }
@@ -74,13 +74,10 @@ export const configure = async (passport: PassportStatic): Promise<PassportStati
           if (
             isProduction() &&
             isKnownDefaultCredentialAttempt(username, password) &&
-            !user.mustChangePassword
+            credential &&
+            !credential.mustChangePassword
           ) {
-            user.mustChangePassword = true;
-            await dbModule.updateUser({
-              username: user.username,
-              mustChangePassword: true,
-            });
+            await getStores().localCredentials.set({ ...credential, mustChangePassword: true });
           }
 
           return done(null, user);
@@ -91,14 +88,13 @@ export const configure = async (passport: PassportStatic): Promise<PassportStati
     ),
   );
 
-  passport.serializeUser((user: Partial<db.User>, done) => {
+  passport.serializeUser((user: Partial<User>, done) => {
     done(null, user.username);
   });
 
   passport.deserializeUser(async (username: string, done) => {
     try {
-      const dbModule = await getDb();
-      const user = await dbModule.findUser(username);
+      const user = await getUserStore().byUsername(username);
       done(null, user);
     } catch (error: unknown) {
       done(error, null);
@@ -119,9 +115,24 @@ export const createDefaultAdmin = async () => {
     type: string,
     isAdmin: boolean,
   ) => {
-    const user = await db.findUser(username);
-    if (!user) {
-      await db.createUser(username, password, email, type, isAdmin, '', isProduction());
+    // 2.x mapping: the single `email` becomes one self-declared primary email,
+    // `gitAccount` has no v3 counterpart (identities come from resolution or
+    // linking), and the `admin` boolean becomes a role.
+    const existing = await getUserStore().byUsername(username);
+    if (!existing) {
+      const user = await getUserStore().create({
+        username,
+        roles: isAdmin ? ['user', 'admin'] : ['user'],
+        emails: [{ address: email, verified: false, source: 'self-declared', primary: true }],
+        scmIdentities: [],
+        sshKeys: [],
+      });
+      void type;
+      await getStores().localCredentials.set({
+        userId: user.id,
+        passwordHash: await bcrypt.hash(password, 10),
+        mustChangePassword: isProduction(),
+      });
     }
   };
 

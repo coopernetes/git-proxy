@@ -14,14 +14,7 @@
  * limitations under the License.
  */
 
-import { RequestHandler } from 'express';
-import { mustChangePassword } from './passwordPolicy';
-
-export const passwordChangeHandler: RequestHandler = (req, res, next) => {
-  if (mustChangePassword(req.user)) {
-    return res.status(428).send({
-      message: 'Password change required before accessing this endpoint',
-    });
-  }
-  return next();
-};
+export * from './resolver';
+export * from './linking';
+export * from './attribution';
+export * as providers from './providers';

@@ -20,7 +20,7 @@ import jwt, { type JwtPayload } from 'jsonwebtoken';
 
 import { JwkKey, JwksResponse, JwtValidationResult } from './types';
 import { RoleMapping } from '../../config/generated/config';
-import { handleErrorAndLog } from '../../utils/errors';
+import { getErrorMessage, handleErrorAndLog } from '../../utils/errors';
 
 /**
  * Obtain the JSON Web Key Set (JWKS) from the OIDC authority.
@@ -91,8 +91,8 @@ export async function validateJwt(
 
     return { verifiedPayload, error: null };
   } catch (error: unknown) {
-    const errorMessage = handleErrorAndLog(error, 'JWT validation failed');
-    return { error: errorMessage, verifiedPayload: null };
+    handleErrorAndLog(error, 'JWT validation failed');
+    return { error: getErrorMessage(error), verifiedPayload: null };
   }
 }
 
