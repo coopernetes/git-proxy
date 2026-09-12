@@ -52,8 +52,6 @@
     }
   },
   "scripts": {
-    "cli": "tsx ./packages/git-proxy-cli/index.ts",
-    "cli:js": "node ./packages/git-proxy-cli/dist/index.js",
     "client": "vite --config vite.config.ts",
     "clientinstall": "npm install --prefix client",
     "server": "cross-env ALLOWED_ORIGINS=* tsx index.ts",
@@ -72,20 +70,12 @@
     "test-coverage-ci": "cross-env NODE_ENV=test vitest --run --config test/vitest.config.ts --dir ./test --coverage.enabled=true --coverage.reporter=lcovonly --coverage.reporter=text",
     "test:integration": "cross-env NODE_ENV=test vitest --run --config test/vitest.integration.config.ts",
     "test:watch": "cross-env NODE_ENV=test vitest --config test/vitest.config.ts --dir ./test --watch",
-    "test:migrate": "cross-env NODE_ENV=test vitest --run --config test/vitest.config.ts --dir ./scripts/migrate/test",
     "prepare": "node ./scripts/prepare.js",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "migrate:urls": "node scripts/migrate/migrate-urls.js",
-    "migrate:users": "node scripts/migrate/migrate-users.js",
-    "backup:urls": "node scripts/migrate/backup-urls.js",
-    "backup:users": "node scripts/migrate/backup-users.js",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,yml,yaml,css,scss}\" --ignore-path .gitignore --config ./.prettierrc",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,yml,yaml,css,scss}\" --ignore-path .gitignore --config ./.prettierrc",
     "gen-schema-doc": "node ./scripts/doc-schema.js",
-    "cypress:run": "cypress run --config-file cypress/cypress.config.js",
-    "cypress:run:docker": "cypress run --config-file cypress/cypress.config.js --config specPattern='cypress/e2e/docker/**/*.cy.{js,ts}'",
-    "cypress:open": "cypress open --config-file cypress/cypress.config.js",
     "generate-config-types": "quicktype --src-lang schema --lang typescript --out src/config/generated/config.ts --top-level GitProxyConfig config.schema.json && ts-node scripts/add-banner.ts src/config/generated/config.ts && prettier --write src/config/generated/config.ts"
   },
   "bin": {
@@ -96,9 +86,6 @@
     "dist",
     "config.schema.json",
     "NOTICE"
-  ],
-  "workspaces": [
-    "./packages/git-proxy-cli"
   ],
   "author": "Paul Groves",
   "license": "Apache-2.0",
@@ -186,10 +173,8 @@
     "@vitest/coverage-v8": "^4.1.8",
     "c8": "^11.0.0",
     "cross-env": "^10.1.0",
-    "cypress": "^15.18.1",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-cypress": "^5.2.1",
     "eslint-plugin-license-header": "^0.9.0",
     "eslint-plugin-react": "^7.37.5",
     "fast-check": "^4.5.3",

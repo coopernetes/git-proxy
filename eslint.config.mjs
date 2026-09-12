@@ -23,7 +23,6 @@ import js from '@eslint/js';
 import ts from 'typescript-eslint';
 import react from 'eslint-plugin-react';
 import json from '@eslint/json';
-import cypress from 'eslint-plugin-cypress';
 import prettierConfig from 'eslint-config-prettier/flat';
 import licenseHeader from 'eslint-plugin-license-header';
 
@@ -47,8 +46,6 @@ export default defineConfig(
       // generated files we don't control
       '**/package-lock.json',
       'src/config/generated/**',
-      // has it's own eslint
-      'experimental/license-inventory',
       // vendored code we're not changing
       'src/ui/assets/js/**',
       'src/ui/assets/css/**',
@@ -169,17 +166,6 @@ export default defineConfig(
       // allow for chai `expect().to.xyz`
       '@typescript-eslint/no-unused-expressions': 'off',
       'new-cap': ['error', { capIsNewExceptionPattern: '^express\\..*' }],
-    },
-  },
-
-  // cypress e2e tests
-  {
-    name: 'cypress',
-    files: ['cypress/**/*.{js,mjs,cjs,ts}'],
-    extends: [cypress.configs.recommended],
-    rules: {
-      // TODO: fix and remove 'warn' override
-      'cypress/unsafe-to-chain-command': 'warn',
     },
   },
 

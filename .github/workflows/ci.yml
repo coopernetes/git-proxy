@@ -56,16 +56,10 @@ jobs:
       - name: Build TypeScript
         run: npm run build-ts
 
-      - name: Build CLI
-        run: |
-          npm run build -w @finos/git-proxy-cli
-          npm rebuild @finos/git-proxy-cli
-
       - name: Test
         id: test
         run: |
           npm run test-coverage-ci
-          npm run test-coverage-ci --workspaces --if-present
 
       - name: MongoDB Integration Tests
         env:
@@ -76,21 +70,11 @@ jobs:
       - name: Upload test coverage report
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
-          files: ./coverage/lcov.info,./coverage-cli/lcov.info
+          files: ./coverage/lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Build frontend
         run: npm run build-ui
-
-      - name: Run cypress test
-        uses: cypress-io/github-action@09090944bd8aaa2a517cefb6e38bf1aae336b42b # v7.4.3
-        with:
-          # skip the action's internal npm ci — dependencies are already installed above
-          install: false
-          start: npm start &
-          wait-on: 'http://localhost:3000'
-          wait-on-timeout: 120
-          command: npm run cypress:run
 
   # Windows build - single combination for development support
   build-windows:
@@ -125,17 +109,11 @@ jobs:
       - name: Build TypeScript
         run: npm run build-ts
 
-      - name: Build CLI
-        run: |
-          npm run build -w @finos/git-proxy-cli
-          npm rebuild @finos/git-proxy-cli
-
       - name: Test
         id: test
         shell: bash
         run: |
           npm run test-coverage-ci
-          npm run test-coverage-ci --workspaces --if-present
 
       # Smoke test deliberately removed due to long running times
       - name: Build frontend

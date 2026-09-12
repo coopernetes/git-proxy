@@ -197,10 +197,6 @@ git-proxy/
 │   ├── plugin.ts           # Plugin base classes (PushActionPlugin, PullActionPlugin)
 │   └── types/              # Shared TypeScript types
 ├── test/                   # Unit, integration, and e2e tests (Vitest)
-├── cypress/                # UI tests (Cypress)
-├── packages/
-│   └── git-proxy-cli/      # CLI package
-├── plugins/                # Sample plugin packages
 ├── website/                # Documentation site (Docusaurus)
 ├── index.ts                # CLI entry point
 ├── proxy.config.json       # Default proxy configuration

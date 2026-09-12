@@ -6,13 +6,5 @@
     "rootDir": "./"
   },
   "include": ["src/**/*", "index.ts"],
-  "exclude": [
-    "experimental/**",
-    "plugins/**",
-    "./dist/**",
-    "**/*.tsx",
-    "**/*.jsx",
-    "./src/context.js",
-    "eslint.config.mjs"
-  ]
+  "exclude": ["./dist/**", "**/*.tsx", "**/*.jsx", "./src/context.js", "eslint.config.mjs"]
 }
