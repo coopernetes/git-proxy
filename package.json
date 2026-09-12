@@ -68,7 +68,7 @@
     "test:e2e:watch": "vitest --config test/e2e/vitest.config.ts",
     "test-coverage": "cross-env NODE_ENV=test vitest --run --config test/vitest.config.ts --dir ./test --coverage",
     "test-coverage-ci": "cross-env NODE_ENV=test vitest --run --config test/vitest.config.ts --dir ./test --coverage.enabled=true --coverage.reporter=lcovonly --coverage.reporter=text",
-    "test:integration": "cross-env NODE_ENV=test vitest --run --config test/vitest.integration.config.ts",
+    "test:integration": "cross-env NODE_ENV=test vitest --run --config test/vitest.config.ts --dir ./test/git/integration",
     "test:watch": "cross-env NODE_ENV=test vitest --config test/vitest.config.ts --dir ./test --watch",
     "prepare": "node ./scripts/prepare.js",
     "lint": "eslint",
@@ -76,7 +76,10 @@
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,yml,yaml,css,scss}\" --ignore-path .gitignore --config ./.prettierrc",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,yml,yaml,css,scss}\" --ignore-path .gitignore --config ./.prettierrc",
     "gen-schema-doc": "node ./scripts/doc-schema.js",
-    "generate-config-types": "quicktype --src-lang schema --lang typescript --out src/config/generated/config.ts --top-level GitProxyConfig config.schema.json && ts-node scripts/add-banner.ts src/config/generated/config.ts && prettier --write src/config/generated/config.ts"
+    "generate-config-types": "quicktype --src-lang schema --lang typescript --out src/config/generated/config.ts --top-level GitProxyConfig config.schema.json && ts-node scripts/add-banner.ts src/config/generated/config.ts && prettier --write src/config/generated/config.ts",
+    "demo": "bash demo/run.sh",
+    "test:unit": "cross-env NODE_ENV=test vitest --run --config test/vitest.config.ts --dir ./test --exclude \"**/integration/**\"",
+    "fixtures:capture": "tsx test/git/fixtures/capture.ts"
   },
   "bin": {
     "git-proxy": "./dist/index.js",
