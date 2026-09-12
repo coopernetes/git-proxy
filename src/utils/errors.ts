@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Step } from '../proxy/actions/Step';
+/** Error helpers shared by the server and the dashboard. Kept concrete because the dashboard calls them at runtime. */
 
-export const getErrorMessage = (error: unknown) => {
+export const getErrorMessage = (error: unknown): string => {
   return error instanceof Error ? error.message : String(error);
 };
 
@@ -26,13 +26,8 @@ export const handleErrorAndLog = (error: unknown, messagePrefix?: string): strin
   return msg;
 };
 
-export const handleErrorAndThrow = (error: unknown, message?: string) => {
+export const handleErrorAndThrow = (error: unknown, message?: string): never => {
   const msg = getErrorMessage(error);
   console.error(message);
   throw new Error(`${message ? `${message}: ` : ''}${msg}`);
-};
-
-export const handleErrorAndLogInStep = (step: Step, error: unknown, messagePrefix?: string) => {
-  const msg = `${messagePrefix ? `${messagePrefix}: ` : ''}${getErrorMessage(error)}`;
-  step.setError(msg);
 };

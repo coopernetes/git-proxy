@@ -36,7 +36,7 @@ import type { DialogHeaderProps } from '@primer/react';
 import { PersonAddIcon, XIcon } from '@primer/octicons-react';
 import { addUser } from '../../../services/repo';
 import { fetchUsersForAutocomplete } from '../../../services/user';
-import { PublicUser } from '../../../../db/types';
+import { PublicUser } from '../../../legacy/types';
 import Warning from '../../../components/Warning/Warning';
 
 type AccessAction = 'authorise' | 'push';

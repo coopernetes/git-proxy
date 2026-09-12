@@ -20,7 +20,7 @@ import { TrashIcon } from '@primer/octicons-react';
 import { DataTable, createColumnHelper } from '@primer/react/experimental';
 import AddUser from './AddUser';
 import UserTableNameCell from '../../../components/UserTableNameCell/UserTableNameCell';
-import { PublicUser } from '../../../../db/types';
+import { PublicUser } from '../../../legacy/types';
 
 type AccessRow = { id: string; username: string };
 

@@ -24,7 +24,7 @@ import {
   XCircleIcon,
 } from '@primer/octicons-react';
 import type { Icon } from '@primer/octicons-react';
-import { RepoActivityTabCounts } from '../../../db/types';
+import { RepoActivityTabCounts } from '../../legacy/types';
 
 type ActivityStatus = keyof RepoActivityTabCounts;
 

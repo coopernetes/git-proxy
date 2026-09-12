@@ -17,7 +17,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 import { Text } from '@primer/react';
-import { PublicUser } from '../../../db/types';
+import { PublicUser } from '../../legacy/types';
 
 export function canNavigateToUserProfile(session: PublicUser | null, targetUsername: string) {
   if (!targetUsername || !session) {

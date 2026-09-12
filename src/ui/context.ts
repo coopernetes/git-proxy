@@ -15,7 +15,7 @@
  */
 
 import { createContext, type Dispatch, type SetStateAction } from 'react';
-import { PublicUser } from '../db/types';
+import { PublicUser } from './legacy/types';
 
 export interface UserContextType {
   user: PublicUser | null;

@@ -16,7 +16,7 @@
 
 import moment from 'moment';
 import { CommitData, PushData, TagData } from '../../types/models';
-import { trimPrefixRefsHeads, trimTrailingDotGit } from '../../db/helper';
+import { trimPrefixRefsHeads, trimTrailingDotGit } from '../legacy/helper';
 
 /**
  * Determines if a push is a tag push

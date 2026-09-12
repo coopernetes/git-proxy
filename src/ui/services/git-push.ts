@@ -17,7 +17,7 @@
 import axios from 'axios';
 import { getAxiosConfig } from './auth';
 import { getApiV1BaseUrl } from './apiConfig';
-import { Action, Step } from '../../proxy/actions';
+import { ActionData, StepData } from '../legacy/types';
 import { PushActionView } from '../types';
 import { ServiceResult, errorResult, successResult } from './errors';
 
@@ -26,11 +26,11 @@ const getPush = async (id: string): Promise<ServiceResult<PushActionView>> => {
   const url = `${apiV1Base}/push/${id}`;
 
   try {
-    const response = await axios<Action>(url, getAxiosConfig());
-    const data: Action = response.data;
+    const response = await axios<ActionData>(url, getAxiosConfig());
+    const data: ActionData = response.data;
     const actionView: PushActionView = {
       ...data,
-      diff: data.steps.find((x: Step) => x.stepName === 'diff')!,
+      diff: data.steps.find((x: StepData) => x.stepName === 'diff')!,
     };
     return successResult(actionView);
   } catch (error: unknown) {
@@ -58,7 +58,7 @@ const getUserActivity = async (username: string): Promise<ServiceResult<PushActi
   const apiV1Base = await getApiV1BaseUrl();
   const path = `${apiV1Base}/user/${encodeURIComponent(username)}/activity`;
   try {
-    const response = await axios<Action[]>(path, getAxiosConfig());
+    const response = await axios<ActionData[]>(path, getAxiosConfig());
     return successResult(response.data as unknown as PushActionView[]);
   } catch (error: unknown) {
     return errorResult(error, 'Failed to load user activity');
@@ -87,7 +87,7 @@ const getPushes = async (query?: GetPushesQuery): Promise<ServiceResult<PushActi
   }
 
   try {
-    const response = await axios<Action[]>(url.toString(), getAxiosConfig());
+    const response = await axios<ActionData[]>(url.toString(), getAxiosConfig());
     return successResult(response.data as unknown as PushActionView[]);
   } catch (error: unknown) {
     return errorResult(error, 'Failed to load pushes');

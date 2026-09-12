@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-import { Action } from '../proxy/actions';
-import { Step } from '../proxy/actions/Step';
-import { Repo } from '../db/types';
-import { Attestation } from '../proxy/processors/types';
+import { ActionData } from './legacy/types';
+import { StepData } from './legacy/types';
+import { Repo } from './legacy/types';
+import { Attestation } from './legacy/types';
 import { Question } from '../config/generated/config';
-
-type ActionMethods =
-  | 'addStep'
-  | 'getLastStep'
-  | 'setCommit'
-  | 'setBranch'
-  | 'setMessage'
-  | 'setAllowPush'
-  | 'setAutoApproval'
-  | 'setAutoRejection'
-  | 'continue';
 
 export interface CancellationData {
   reviewer: {
@@ -53,8 +42,8 @@ export interface BackendResponse {
   message: string;
 }
 
-export interface PushActionView extends Omit<Action, ActionMethods> {
-  diff: Step;
+export interface PushActionView extends ActionData {
+  diff: StepData;
 }
 
 export interface RepoView extends Repo {

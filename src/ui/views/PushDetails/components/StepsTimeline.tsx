@@ -23,7 +23,7 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
 } from '@primer/octicons-react';
-import { StepData } from '../../../../proxy/actions/Step';
+import { StepData } from '../../../legacy/types';
 
 interface StepsTimelineProps {
   steps: StepData[];

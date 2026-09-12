@@ -16,7 +16,7 @@
 
 import React, { useContext, useState, useEffect } from 'react';
 import { getUserInfo } from '../services/auth';
-import { PublicUser } from '../../db/types';
+import { PublicUser } from '../legacy/types';
 import { AuthContext } from '../context';
 
 export const AuthProvider = ({ children }: React.PropsWithChildren) => {

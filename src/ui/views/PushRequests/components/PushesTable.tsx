@@ -23,7 +23,7 @@ import { DataTable, createColumnHelper } from '@primer/react/experimental';
 import Pagination from '../../../components/Pagination/Pagination';
 import UserIdentity from '../../../components/UserIdentity/UserIdentity';
 import { PushActionView, RepoView } from '../../../types';
-import { trimPrefixRefsHeads } from '../../../../db/helper';
+import { trimPrefixRefsHeads } from '../../../legacy/helper';
 import { canonicalRemoteUrl } from '../../../utils/parseGitRemoteUrl';
 import type { ActivityTab } from '../activityListQuery';
 import { buildRepoDisplayIndex, resolveActivityRepoDisplay } from '../activityTabFilters';

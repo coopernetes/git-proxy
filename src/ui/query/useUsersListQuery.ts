@@ -17,7 +17,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchUsersForAutocomplete } from '../services/user';
 import { userQueryKeys } from './userQueryKeys';
-import { PublicUser } from '../../db/types';
+import { PublicUser } from '../legacy/types';
 
 /**
  * Shared cache for GET /user (unsorted). Consumers apply sorting locally.

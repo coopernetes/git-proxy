@@ -37,7 +37,7 @@ import Reject from './components/Reject';
 import { authorisePush, rejectPush, cancelPush } from '../../services/git-push';
 import type { ServiceResult } from '../../services/errors';
 import { PushActionView, RepoView } from '../../types';
-import { trimPrefixRefsHeads, trimTrailingDotGit } from '../../../db/helper';
+import { trimPrefixRefsHeads, trimTrailingDotGit } from '../../legacy/helper';
 import { sortRepoViews } from '../../services/repo';
 import { useRepoViewsListQuery } from '../../query/useRepoViewsListQuery';
 import { usePushQuery } from '../../query/usePushQuery';

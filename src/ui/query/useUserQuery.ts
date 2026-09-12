@@ -20,7 +20,7 @@ import axios from 'axios';
 import { getAxiosConfig } from '../services/auth';
 import { getBaseUrl, getApiV1BaseUrl } from '../services/apiConfig';
 import { userQueryKeys } from './userQueryKeys';
-import { PublicUser } from '../../db/types';
+import { PublicUser } from '../legacy/types';
 
 async function fetchUser(id: string | null | undefined): Promise<PublicUser> {
   const baseUrl = await getBaseUrl();

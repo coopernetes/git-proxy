@@ -18,7 +18,7 @@ import React, { useMemo } from 'react';
 import { Link } from 'react-router';
 import { DataTable, createColumnHelper } from '@primer/react/experimental';
 import { Label, Stack, Text } from '@primer/react';
-import { PublicUser } from '../../../../db/types';
+import { PublicUser } from '../../../legacy/types';
 import ListFilterInput from '../../../components/ListFilterInput/ListFilterInput';
 import Pagination from '../../../components/Pagination/Pagination';
 import ActivityBadgeGroup from '../../../components/ActivityBadgeGroup/ActivityBadgeGroup';

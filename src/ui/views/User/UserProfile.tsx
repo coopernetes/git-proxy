@@ -50,7 +50,7 @@ import {
   SSHConfig,
 } from '../../services/ssh';
 
-import { PublicUser } from '../../../db/types';
+import { PublicUser } from '../../legacy/types';
 
 const externalLinkClass =
   'text-sm text-[#0969da] underline underline-offset-2 decoration-[#0969da]/80 hover:text-[#0550ae]';

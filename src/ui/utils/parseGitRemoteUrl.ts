@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export { canonicalRemoteUrl } from '../../activity/canonicalRemoteUrl';
+export { canonicalRemoteUrl } from '../legacy/canonicalRemoteUrl';
 
 export type ParsedGitRemotePath = {
   /** Path segments before the repo (org or org/group/...). */

@@ -16,7 +16,7 @@
 
 import axios from 'axios';
 import { getAxiosConfig } from './auth.js';
-import { Repo } from '../../db/types';
+import { Repo } from '../legacy/types';
 import { RepoView } from '../types';
 import { getApiV1BaseUrl } from './apiConfig';
 import { ServiceResult, getServiceError, errorResult, successResult } from './errors';

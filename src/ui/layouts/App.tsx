@@ -23,7 +23,7 @@ import logo from '../assets/img/git-proxy.png';
 import { UserContext } from '../context';
 import { getUser } from '../services/user';
 import { Route as RouteType } from '../types';
-import { PublicUser } from '../../db/types';
+import { PublicUser } from '../legacy/types';
 import { ErrorBoundary } from '../components/ErrorBoundary/ErrorBoundary';
 import {
   dashboardColumnClass,

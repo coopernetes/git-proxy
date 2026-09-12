@@ -16,7 +16,7 @@
 
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { getAxiosConfig, processAuthError } from './auth';
-import { PublicUser } from '../../db/types';
+import { PublicUser } from '../legacy/types';
 import { BackendResponse } from '../types';
 import { getBaseUrl, getApiV1BaseUrl } from './apiConfig';
 import { errorResult, formatErrorMessage, getServiceError, successResult } from './errors';

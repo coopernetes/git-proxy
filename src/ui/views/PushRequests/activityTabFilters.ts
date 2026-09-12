@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { activityPrimaryStatusFromFlags } from '../../../activity/activityPrimaryStatus';
-import { trimTrailingDotGit } from '../../../db/helper';
+import { activityPrimaryStatusFromFlags } from '../../legacy/activityPrimaryStatus';
+import { trimTrailingDotGit } from '../../legacy/helper';
 import { PushActionView, RepoView } from '../../types';
 import { canonicalRemoteUrl } from '../../utils/parseGitRemoteUrl';
 import { ACTIVITY_TAB_VALUES, type ActivityTab } from './activityListQuery';

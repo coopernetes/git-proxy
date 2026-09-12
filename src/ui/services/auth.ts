@@ -16,7 +16,7 @@
 
 import { AxiosError } from 'axios';
 import { getCookie } from '../utils';
-import { PublicUser } from '../../db/types';
+import { PublicUser } from '../legacy/types';
 import { BackendResponse } from '../types';
 import { getBaseUrl } from './apiConfig';
 import { getErrorMessage } from '../../utils/errors';

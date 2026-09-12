@@ -18,7 +18,7 @@ import React, { useMemo } from 'react';
 import { DateTime } from 'luxon';
 import { Text } from '@primer/react';
 import { DataTable, createColumnHelper } from '@primer/react/experimental';
-import { CommitData } from '../../../../proxy/processors/types';
+import { CommitData } from '../../../legacy/types';
 import UserIdentity from '../../../components/UserIdentity/UserIdentity';
 
 /** Match {@link PushesTable} body typography. */
