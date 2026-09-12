@@ -1,0 +1,1147 @@
+openapi: 3.1.0
+info:
+  title: GitProxy v3 service API
+  version: 3.0.0-draft
+  description: |
+    Minimal API surface behind the dashboard and for scripted use. Every
+    mutating verb is denied unless the authorization matrix permits it.
+    Push records, grants and users are the shapes defined in src/domain.
+servers:
+  - url: /api/v1
+security:
+  - session: []
+  - bearer: []
+tags:
+  - name: auth
+  - name: pushes
+  - name: repositories
+  - name: users
+  - name: groups
+  - name: grants
+  - name: access-rules
+  - name: providers
+  - name: config
+  - name: audit
+paths:
+  /auth/login:
+    post: { tags: [auth], summary: Log in with the local strategy, or start OIDC, security: [] }
+  /auth/logout:
+    post: { tags: [auth], summary: End the session }
+  /auth/me:
+    get:
+      {
+        tags: [auth],
+        summary: The authenticated user,
+        responses: { '200': { $ref: '#/components/responses/User' } },
+      }
+  /auth/password:
+    post: { tags: [auth], summary: Change the local password; honours the must-change flag }
+
+  /pushes:
+    get:
+      tags: [pushes]
+      summary: List push records
+      parameters:
+        - {
+            name: state,
+            in: query,
+            schema: { type: array, items: { $ref: '#/components/schemas/PushState' } },
+          }
+        - { name: providerId, in: query, schema: { type: string } }
+        - { name: owner, in: query, schema: { type: string } }
+        - { name: name, in: query, schema: { type: string } }
+        - { name: ref, in: query, schema: { type: string } }
+        - { name: pusherUserId, in: query, schema: { type: string } }
+        - { name: since, in: query, schema: { type: string, format: date-time } }
+        - { name: cursor, in: query, schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, maximum: 200 } }
+      responses: { '200': { $ref: '#/components/responses/PushPage' } }
+  /pushes/counts:
+    get:
+      {
+        tags: [pushes],
+        summary: Per-state counts,
+        responses:
+          {
+            '200':
+              {
+                description: counts,
+                content:
+                  {
+                    application/json:
+                      { schema: { type: object, additionalProperties: { type: integer } } },
+                  },
+              },
+          },
+      }
+  /pushes/{id}:
+    get:
+      {
+        tags: [pushes],
+        summary: One push record,
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses:
+          {
+            '200': { $ref: '#/components/responses/Push' },
+            '404': { $ref: '#/components/responses/NotFound' },
+          },
+      }
+  /pushes/{id}/audit:
+    get:
+      {
+        tags: [pushes],
+        summary: Ordered transition events,
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses:
+          {
+            '200':
+              {
+                description: events,
+                content:
+                  {
+                    application/json:
+                      {
+                        schema: { type: array, items: { $ref: '#/components/schemas/AuditEvent' } },
+                      },
+                  },
+              },
+          },
+      }
+  /pushes/{id}/diff:
+    get:
+      {
+        tags: [pushes],
+        summary: Unified diff of the introduced range,
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses: { '200': { description: diff, content: { text/plain: {} } } },
+      }
+  /pushes/{id}/approve:
+    post:
+      tags: [pushes]
+      summary: pending -> approved; the reviewer is the session user, compared with the resolved pusher
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody:
+        {
+          content:
+            { application/json: { schema: { $ref: '#/components/schemas/ApproveRequest' } } },
+        }
+      responses:
+        {
+          '200': { $ref: '#/components/responses/Push' },
+          '403': { $ref: '#/components/responses/Denied' },
+          '409': { $ref: '#/components/responses/Conflict' },
+        }
+  /pushes/{id}/reject:
+    post:
+      tags: [pushes]
+      summary: pending -> rejected; a reason is required
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody:
+        {
+          required: true,
+          content: { application/json: { schema: { $ref: '#/components/schemas/ReasonRequest' } } },
+        }
+      responses:
+        {
+          '200': { $ref: '#/components/responses/Push' },
+          '403': { $ref: '#/components/responses/Denied' },
+          '409': { $ref: '#/components/responses/Conflict' },
+        }
+  /pushes/{id}/cancel:
+    post:
+      tags: [pushes]
+      summary: pending -> canceled; the pusher, a holder of the cancel capability, or an admin
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody:
+        {
+          required: true,
+          content: { application/json: { schema: { $ref: '#/components/schemas/ReasonRequest' } } },
+        }
+      responses:
+        {
+          '200': { $ref: '#/components/responses/Push' },
+          '403': { $ref: '#/components/responses/Denied' },
+          '409': { $ref: '#/components/responses/Conflict' },
+        }
+
+  /repositories:
+    get:
+      {
+        tags: [repositories],
+        summary: Registered repositories,
+        responses:
+          {
+            '200':
+              {
+                description: page,
+                content:
+                  { application/json: { schema: { $ref: '#/components/schemas/RepositoryPage' } } },
+              },
+          },
+      }
+    post:
+      {
+        tags: [repositories],
+        summary: Register (admin),
+        requestBody:
+          {
+            required: true,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: '#/components/schemas/RegisterRepositoryRequest' } },
+              },
+          },
+        responses: { '201': { description: registered } },
+      }
+  /repositories/{id}:
+    get:
+      {
+        tags: [repositories],
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses:
+          {
+            '200':
+              {
+                description: repository,
+                content:
+                  {
+                    application/json:
+                      { schema: { $ref: '#/components/schemas/RegisteredRepository' } },
+                  },
+              },
+          },
+      }
+    delete:
+      {
+        tags: [repositories],
+        summary: Remove (admin); push records keep their identity tuple,
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses: { '204': { description: removed } },
+      }
+  /repositories/{id}/grants:
+    get:
+      {
+        tags: [repositories],
+        summary: Grants whose target matches this repository,
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses: { '200': { $ref: '#/components/responses/Grants' } },
+      }
+
+  /users/me:
+    get: { tags: [users], responses: { '200': { $ref: '#/components/responses/User' } } }
+  /users/me/grants:
+    get:
+      {
+        tags: [users],
+        summary: Effective grants,
+        direct and via groups,
+        responses: { '200': { $ref: '#/components/responses/Grants' } },
+      }
+  /users/me/emails:
+    post:
+      {
+        tags: [users],
+        summary: Add a self-declared email,
+        requestBody:
+          {
+            required: true,
+            content:
+              {
+                application/json:
+                  {
+                    schema:
+                      {
+                        type: object,
+                        required: [address],
+                        properties: { address: { type: string, format: email } },
+                      },
+                  },
+              },
+          },
+        responses: { '201': { description: added } },
+      }
+  /users/me/emails/{address}:
+    delete:
+      {
+        tags: [users],
+        parameters: [{ name: address, in: path, required: true, schema: { type: string } }],
+        responses: { '204': { description: removed } },
+      }
+  /users/me/identities:
+    post:
+      {
+        tags: [users],
+        summary: Declare a provider login; verified only through a link or a provider lookup,
+        requestBody:
+          {
+            required: true,
+            content:
+              {
+                application/json:
+                  {
+                    schema:
+                      {
+                        type: object,
+                        required: [providerId, login],
+                        properties: { providerId: { type: string }, login: { type: string } },
+                      },
+                  },
+              },
+          },
+        responses: { '201': { description: added } },
+      }
+  /users/me/identities/{providerId}/{login}:
+    delete:
+      {
+        tags: [users],
+        parameters:
+          [
+            { name: providerId, in: path, required: true, schema: { type: string } },
+            { name: login, in: path, required: true, schema: { type: string } },
+          ],
+        responses: { '204': { description: removed } },
+      }
+  /users/me/ssh-keys:
+    post:
+      {
+        tags: [users],
+        summary: Add a self-declared key,
+        requestBody:
+          {
+            required: true,
+            content:
+              {
+                application/json:
+                  {
+                    schema:
+                      {
+                        type: object,
+                        required: [publicKey],
+                        properties: { publicKey: { type: string } },
+                      },
+                  },
+              },
+          },
+        responses: { '201': { description: added } },
+      }
+  /users/me/ssh-keys/{fingerprint}:
+    delete:
+      {
+        tags: [users],
+        parameters: [{ name: fingerprint, in: path, required: true, schema: { type: string } }],
+        responses: { '204': { description: removed } },
+      }
+  /users/me/links/{providerId}:
+    get:
+      {
+        tags: [users],
+        summary: Start an account-linking flow; redirects to the provider,
+        parameters: [{ name: providerId, in: path, required: true, schema: { type: string } }],
+        responses: { '302': { description: redirect } },
+      }
+  /users/me/links/{providerId}/callback:
+    get:
+      {
+        tags: [users],
+        summary: Completes the link; the identity becomes verified,
+        parameters: [{ name: providerId, in: path, required: true, schema: { type: string } }],
+        responses: { '302': { description: redirect to the profile } },
+      }
+  /users:
+    get:
+      {
+        tags: [users],
+        summary: List (admin),
+        responses:
+          {
+            '200':
+              {
+                description: page,
+                content:
+                  { application/json: { schema: { $ref: '#/components/schemas/UserPage' } } },
+              },
+          },
+      }
+    post:
+      {
+        tags: [users],
+        summary: Create (admin); config-sourced users are refused,
+        requestBody:
+          {
+            required: true,
+            content:
+              { application/json: { schema: { $ref: '#/components/schemas/CreateUserRequest' } } },
+          },
+        responses: { '201': { description: created } },
+      }
+  /users/{id}:
+    get:
+      {
+        tags: [users],
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses: { '200': { $ref: '#/components/responses/User' } },
+      }
+    patch:
+      {
+        tags: [users],
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses: { '200': { $ref: '#/components/responses/User' } },
+      }
+    delete:
+      {
+        tags: [users],
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses: { '204': { description: removed } },
+      }
+  /users/{id}/roles:
+    put:
+      {
+        tags: [users],
+        summary: Replace roles (admin); audited,
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        requestBody:
+          {
+            required: true,
+            content:
+              {
+                application/json:
+                  { schema: { type: array, items: { $ref: '#/components/schemas/UserRole' } } },
+              },
+          },
+        responses: { '200': { $ref: '#/components/responses/User' } },
+      }
+  /users/{id}/grants:
+    get:
+      {
+        tags: [users],
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses: { '200': { $ref: '#/components/responses/Grants' } },
+      }
+  /users/{id}/emails:
+    post:
+      {
+        tags: [users],
+        summary: Add an email (admin); source recorded as admin,
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses: { '201': { description: added } },
+      }
+  /users/{id}/identities:
+    post:
+      {
+        tags: [users],
+        summary: Add a provider login (admin); source recorded as admin,
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses: { '201': { description: added } },
+      }
+
+  /groups:
+    get:
+      {
+        tags: [groups],
+        responses:
+          {
+            '200':
+              {
+                description: groups,
+                content:
+                  {
+                    application/json:
+                      { schema: { type: array, items: { $ref: '#/components/schemas/Group' } } },
+                  },
+              },
+          },
+      }
+    post:
+      {
+        tags: [groups],
+        requestBody:
+          {
+            required: true,
+            content:
+              { application/json: { schema: { $ref: '#/components/schemas/UpsertGroupRequest' } } },
+          },
+        responses: { '201': { description: created } },
+      }
+  /groups/{id}:
+    put:
+      {
+        tags: [groups],
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        requestBody:
+          {
+            required: true,
+            content:
+              { application/json: { schema: { $ref: '#/components/schemas/UpsertGroupRequest' } } },
+          },
+        responses: { '200': { description: updated } },
+      }
+    delete:
+      {
+        tags: [groups],
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses: { '204': { description: removed } },
+      }
+  /groups/{id}/members:
+    post:
+      {
+        tags: [groups],
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        requestBody:
+          {
+            required: true,
+            content:
+              {
+                application/json:
+                  {
+                    schema:
+                      {
+                        type: object,
+                        required: [userId],
+                        properties: { userId: { type: string } },
+                      },
+                  },
+              },
+          },
+        responses: { '204': { description: added } },
+      }
+  /groups/{id}/members/{userId}:
+    delete:
+      {
+        tags: [groups],
+        parameters:
+          [
+            { $ref: '#/components/parameters/id' },
+            { name: userId, in: path, required: true, schema: { type: string } },
+          ],
+        responses: { '204': { description: removed } },
+      }
+  /groups/{id}/grants:
+    get:
+      {
+        tags: [groups],
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses: { '200': { $ref: '#/components/responses/Grants' } },
+      }
+
+  /grants:
+    get: { tags: [grants], responses: { '200': { $ref: '#/components/responses/Grants' } } }
+    post:
+      {
+        tags: [grants],
+        requestBody:
+          {
+            required: true,
+            content:
+              { application/json: { schema: { $ref: '#/components/schemas/CreateGrantRequest' } } },
+          },
+        responses: { '201': { description: created } },
+      }
+  /grants/{id}:
+    delete:
+      {
+        tags: [grants],
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses: { '204': { description: removed } },
+      }
+  /grants/test:
+    post:
+      tags: [grants]
+      summary: Evaluate an authorization query; returns the decision and the matched grant
+      requestBody:
+        {
+          required: true,
+          content:
+            { application/json: { schema: { $ref: '#/components/schemas/AuthorizationQuery' } } },
+        }
+      responses:
+        {
+          '200':
+            {
+              description: decision,
+              content:
+                {
+                  application/json:
+                    { schema: { $ref: '#/components/schemas/AuthorizationDecision' } },
+                },
+            },
+        }
+
+  /access-rules:
+    get:
+      {
+        tags: [access-rules],
+        responses:
+          {
+            '200':
+              {
+                description: ordered rules,
+                content:
+                  {
+                    application/json:
+                      {
+                        schema: { type: array, items: { $ref: '#/components/schemas/AccessRule' } },
+                      },
+                  },
+              },
+          },
+      }
+    post:
+      {
+        tags: [access-rules],
+        requestBody:
+          {
+            required: true,
+            content: { application/json: { schema: { $ref: '#/components/schemas/AccessRule' } } },
+          },
+        responses: { '201': { description: created } },
+      }
+  /access-rules/{id}:
+    put:
+      {
+        tags: [access-rules],
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses: { '200': { description: updated } },
+      }
+    delete:
+      {
+        tags: [access-rules],
+        parameters: [{ $ref: '#/components/parameters/id' }],
+        responses: { '204': { description: removed } },
+      }
+  /access-rules/order:
+    put:
+      {
+        tags: [access-rules],
+        summary: Replace the evaluation order,
+        requestBody:
+          {
+            required: true,
+            content: { application/json: { schema: { type: array, items: { type: string } } } },
+          },
+        responses: { '204': { description: reordered } },
+      }
+  /access-rules/test:
+    post:
+      {
+        tags: [access-rules],
+        summary: Evaluate a repository path and service against the rules,
+        responses: { '200': { description: matched rule or none } },
+      }
+
+  /providers:
+    get:
+      {
+        tags: [providers],
+        summary: Configured providers with capability flags; presence only,
+        responses:
+          {
+            '200':
+              {
+                description: providers,
+                content:
+                  {
+                    application/json:
+                      { schema: { type: array, items: { $ref: '#/components/schemas/Provider' } } },
+                  },
+              },
+          },
+      }
+
+  /config:
+    get:
+      {
+        tags: [config],
+        summary: Effective configuration,
+        secrets redacted (admin),
+        responses: { '200': { description: config } },
+      }
+  /config/reload:
+    post:
+      {
+        tags: [config],
+        summary: Reload policy sections (admin); audited,
+        responses: { '204': { description: reloaded } },
+      }
+  /setup:
+    get:
+      {
+        tags: [config],
+        summary: Client setup,
+        public,
+        security: [],
+        responses:
+          {
+            '200':
+              {
+                description: setup,
+                content:
+                  { application/json: { schema: { $ref: '#/components/schemas/SetupResponse' } } },
+              },
+          },
+      }
+
+  /audit:
+    get:
+      {
+        tags: [audit],
+        summary: Administrative audit events (admin),
+        responses: { '200': { description: page } },
+      }
+  /audit/fetches:
+    get:
+      {
+        tags: [audit],
+        summary: Fetch operation records (admin),
+        responses: { '200': { description: page } },
+      }
+
+components:
+  securitySchemes:
+    session: { type: apiKey, in: cookie, name: connect.sid }
+    bearer: { type: http, scheme: bearer, bearerFormat: JWT }
+  parameters:
+    id: { name: id, in: path, required: true, schema: { type: string } }
+  responses:
+    Push:
+      {
+        description: push record,
+        content: { application/json: { schema: { $ref: '#/components/schemas/PushRecord' } } },
+      }
+    PushPage:
+      {
+        description: page,
+        content:
+          {
+            application/json:
+              {
+                schema:
+                  {
+                    type: object,
+                    properties:
+                      {
+                        items: { type: array, items: { $ref: '#/components/schemas/PushRecord' } },
+                        nextCursor: { type: string },
+                      },
+                  },
+              },
+          },
+      }
+    User:
+      {
+        description: user,
+        content: { application/json: { schema: { $ref: '#/components/schemas/User' } } },
+      }
+    Grants:
+      {
+        description: grants,
+        content:
+          {
+            application/json:
+              { schema: { type: array, items: { $ref: '#/components/schemas/Grant' } } },
+          },
+      }
+    NotFound: { description: not found }
+    Denied:
+      {
+        description: denied by the authorization matrix or the self-approval rule,
+        content: { application/json: { schema: { $ref: '#/components/schemas/Problem' } } },
+      }
+    Conflict:
+      {
+        description: the record is not in a state that permits this transition,
+        content: { application/json: { schema: { $ref: '#/components/schemas/Problem' } } },
+      }
+  schemas:
+    Problem: { type: object, properties: { message: { type: string } } }
+    PushState:
+      {
+        type: string,
+        enum: [received, processing, pending, approved, forwarded, rejected, canceled, error],
+      }
+    UserRole: { type: string, enum: [user, reviewer, admin] }
+    Capability: { type: string, enum: [push, review, self-certify, cancel, fetch] }
+    VerificationSource:
+      {
+        type: string,
+        enum: [provider-token, provider-key-listing, account-link, idp, admin, self-declared],
+      }
+    RepositoryIdentity:
+      {
+        type: object,
+        required: [providerId, host, owner, name],
+        properties:
+          {
+            providerId: { type: string },
+            host: { type: string },
+            owner: { type: string },
+            name: { type: string },
+          },
+      }
+    RefUpdate:
+      {
+        type: object,
+        required: [ref, oldOid, newOid],
+        properties: { ref: { type: string }, oldOid: { type: string }, newOid: { type: string } },
+      }
+    Pusher:
+      type: object
+      properties:
+        anchor:
+          { type: object, properties: { kind: { type: string, enum: [token, ssh-key, oidc] } } }
+        presented: { type: string, description: Recorded, never trusted }
+        resolved:
+          { type: object, properties: { providerId: { type: string }, login: { type: string } } }
+        userId: { type: string }
+        assurance: { type: string, enum: [unconfirmed, confirmed, verified] }
+    Attestation:
+      type: object
+      properties:
+        actorType: { type: string, enum: [automated, human] }
+        actor:
+          { type: object, properties: { userId: { type: string }, username: { type: string } } }
+        timestamp: { type: string, format: date-time }
+        reason: { type: string }
+        answers:
+          {
+            type: array,
+            items:
+              {
+                type: object,
+                properties: { question: { type: string }, answered: { type: boolean } },
+              },
+          }
+        selfApprovalOverride: { type: boolean }
+        matchedRule: { type: string }
+    StepResult:
+      type: object
+      properties:
+        name: { type: string }
+        order: { type: integer }
+        outcome: { type: string, enum: [passed, violation, could-not-run, defer, allow] }
+        message: { type: string }
+        findings: { type: array, items: { $ref: '#/components/schemas/Finding' } }
+        couldNotRunDisposition: { type: string, enum: [reject, defer, pass-through] }
+    Finding:
+      {
+        type: object,
+        properties:
+          {
+            rule: { type: string },
+            severity: { type: string, enum: [info, low, medium, high, critical] },
+            message: { type: string },
+            locator:
+              {
+                type: object,
+                properties:
+                  { path: { type: string }, line: { type: integer }, oid: { type: string } },
+              },
+          },
+      }
+    PushRecord:
+      type: object
+      required:
+        [id, state, receivedAt, repository, refUpdate, transport, mode, pusher, commits, steps]
+      properties:
+        id: { type: string, description: Assigned and opaque; the correlation identifier }
+        state: { $ref: '#/components/schemas/PushState' }
+        receivedAt: { type: string, format: date-time }
+        repository: { $ref: '#/components/schemas/RepositoryIdentity' }
+        refUpdate: { $ref: '#/components/schemas/RefUpdate' }
+        transport: { type: string, enum: [https, ssh] }
+        mode: { type: string, enum: [relay, server] }
+        pusher: { $ref: '#/components/schemas/Pusher' }
+        commits: { type: array, items: { type: object } }
+        steps: { type: array, items: { $ref: '#/components/schemas/StepResult' } }
+        packDigest: { type: string }
+        summary: { type: string }
+        approval: { $ref: '#/components/schemas/Attestation' }
+        rejection: { $ref: '#/components/schemas/Attestation' }
+        cancellation: { $ref: '#/components/schemas/Attestation' }
+        errorCause: { type: string }
+        forwardedAt: { type: string, format: date-time }
+        consumedApprovalId: { type: string }
+        approvalConsumedAt: { type: string, format: date-time }
+    AuditEvent:
+      {
+        type: object,
+        properties:
+          {
+            id: { type: string },
+            pushId: { type: string },
+            from: { $ref: '#/components/schemas/PushState' },
+            to: { $ref: '#/components/schemas/PushState' },
+            occurredAt: { type: string, format: date-time },
+            actorType: { type: string, enum: [automated, human] },
+            actor: { type: object },
+            trigger: { type: string },
+            matchedRule: { type: string },
+          },
+      }
+    ApproveRequest:
+      {
+        type: object,
+        properties:
+          {
+            answers:
+              {
+                type: array,
+                items:
+                  {
+                    type: object,
+                    properties: { question: { type: string }, answered: { type: boolean } },
+                  },
+              },
+            selfApprovalOverride: { type: boolean },
+          },
+      }
+    ReasonRequest: { type: object, required: [reason], properties: { reason: { type: string } } }
+    RegisteredRepository:
+      {
+        type: object,
+        properties:
+          {
+            id: { type: string },
+            identity: { $ref: '#/components/schemas/RepositoryIdentity' },
+            upstreamUrl: { type: string },
+          },
+      }
+    RepositoryPage:
+      {
+        type: object,
+        properties:
+          {
+            items: { type: array, items: { $ref: '#/components/schemas/RegisteredRepository' } },
+            nextCursor: { type: string },
+          },
+      }
+    RegisterRepositoryRequest:
+      {
+        type: object,
+        required: [providerId, path],
+        properties:
+          {
+            providerId: { type: string },
+            path: { type: string, description: owner/name, nested owners allowed },
+          },
+      }
+    User:
+      type: object
+      properties:
+        id: { type: string }
+        username: { type: string }
+        displayName: { type: string }
+        roles: { type: array, items: { $ref: '#/components/schemas/UserRole' } }
+        emails:
+          {
+            type: array,
+            items:
+              {
+                type: object,
+                properties:
+                  {
+                    address: { type: string },
+                    verified: { type: boolean },
+                    source: { $ref: '#/components/schemas/VerificationSource' },
+                    primary: { type: boolean },
+                  },
+              },
+            description: Omitted for non-admin callers on other users,
+          }
+        scmIdentities:
+          {
+            type: array,
+            items:
+              {
+                type: object,
+                properties:
+                  {
+                    providerId: { type: string },
+                    login: { type: string },
+                    verified: { type: boolean },
+                    source: { $ref: '#/components/schemas/VerificationSource' },
+                  },
+              },
+          }
+        sshKeys:
+          {
+            type: array,
+            items:
+              {
+                type: object,
+                properties:
+                  {
+                    fingerprint: { type: string },
+                    algorithm: { type: string },
+                    addedAt: { type: string },
+                    source: { $ref: '#/components/schemas/VerificationSource' },
+                    providerId: { type: string },
+                  },
+              },
+          }
+    UserPage:
+      {
+        type: object,
+        properties:
+          {
+            items: { type: array, items: { $ref: '#/components/schemas/User' } },
+            nextCursor: { type: string },
+          },
+      }
+    CreateUserRequest:
+      {
+        type: object,
+        required: [username],
+        properties:
+          {
+            username: { type: string },
+            displayName: { type: string },
+            roles: { type: array, items: { $ref: '#/components/schemas/UserRole' } },
+            password: { type: string, description: local strategy only },
+          },
+      }
+    Group:
+      {
+        type: object,
+        properties:
+          {
+            id: { type: string },
+            name: { type: string },
+            memberIds: { type: array, items: { type: string } },
+            idpGroup: { type: string },
+          },
+      }
+    UpsertGroupRequest:
+      {
+        type: object,
+        required: [name],
+        properties:
+          {
+            name: { type: string },
+            memberIds: { type: array, items: { type: string } },
+            idpGroup: { type: string },
+          },
+      }
+    Target:
+      {
+        type: object,
+        required: [kind, match, value],
+        properties:
+          {
+            kind: { type: string, enum: [slug, owner, name] },
+            match: { type: string, enum: [literal, glob, regex] },
+            value: { type: string },
+          },
+      }
+    Grant:
+      type: object
+      properties:
+        id: { type: string }
+        grant: { type: string, enum: [PUSH, REVIEW, SELF_CERTIFY, PUSH_AND_REVIEW, FETCH] }
+        target: { $ref: '#/components/schemas/Target' }
+        subject:
+          {
+            oneOf:
+              [
+                { type: object, required: [userId], properties: { userId: { type: string } } },
+                { type: object, required: [groupId], properties: { groupId: { type: string } } },
+              ],
+          }
+        providerId: { type: string }
+        grantedBy: { type: string }
+        grantedAt: { type: string, format: date-time }
+    CreateGrantRequest:
+      {
+        type: object,
+        required: [grant, target, subject],
+        properties:
+          {
+            grant: { type: string },
+            target: { $ref: '#/components/schemas/Target' },
+            subject: { type: object },
+            providerId: { type: string },
+          },
+      }
+    AuthorizationQuery:
+      {
+        type: object,
+        required: [userId, capability, repository],
+        properties:
+          {
+            userId: { type: string },
+            capability: { $ref: '#/components/schemas/Capability' },
+            repository:
+              {
+                type: object,
+                properties:
+                  { providerId: { type: string }, owner: { type: string }, name: { type: string } },
+              },
+          },
+      }
+    AuthorizationDecision:
+      {
+        type: object,
+        properties: { permitted: { type: boolean }, matchedGrantId: { type: string } },
+      }
+    AccessRule:
+      {
+        type: object,
+        required: [order, effect, target, services],
+        properties:
+          {
+            id: { type: string },
+            order: { type: integer },
+            effect: { type: string, enum: [allow, deny] },
+            target: { $ref: '#/components/schemas/Target' },
+            providerId: { type: string },
+            services: { type: array, items: { type: string, enum: [upload-pack, receive-pack] } },
+          },
+      }
+    Provider:
+      {
+        type: object,
+        properties:
+          {
+            id: { type: string },
+            kind: { type: string, enum: [github, gitlab, forgejo, bitbucket, generic] },
+            gitUrl: { type: string },
+            capabilities:
+              {
+                type: object,
+                properties:
+                  {
+                    tokenIdentity: { type: boolean },
+                    keyIdentity: { type: boolean },
+                    accountLinking: { type: boolean },
+                  },
+              },
+            sshEnabled: { type: boolean },
+            mode: { type: string, enum: [relay, server] },
+          },
+      }
+    SetupResponse:
+      {
+        type: object,
+        properties:
+          {
+            providers:
+              {
+                type: array,
+                items:
+                  {
+                    type: object,
+                    properties:
+                      {
+                        host: { type: string },
+                        proxyUrlPrefix: { type: string },
+                        sshEnabled: { type: boolean },
+                      },
+                  },
+              },
+            gitConfig:
+              {
+                type: object,
+                properties: { pushOnly: { type: string }, fetchAndPush: { type: string } },
+              },
+          },
+      }

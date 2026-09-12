@@ -1,0 +1,504 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/finos/git-proxy/config.v3.schema.json",
+  "title": "GitProxy v3 configuration",
+  "description": "Draft. Replaces the top-level keys of proxy.config.json. src/config/v3.ts is generated from this file.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["providers", "listeners", "modes", "store", "dashboardAuth"],
+  "properties": {
+    "providers": {
+      "type": "array",
+      "description": "Configured upstream hosts.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "gitUrl"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["github", "gitlab", "forgejo", "bitbucket", "generic"]
+          },
+          "gitUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "apiUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Identity API base URL where the platform offers one."
+          },
+          "ssh": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["enabled", "host", "port", "hostKeyFingerprints"],
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false
+              },
+              "host": {
+                "type": "string"
+              },
+              "port": {
+                "type": "integer",
+                "default": 22
+              },
+              "hostKeyFingerprints": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Pinned upstream host keys; mismatch refuses the connection."
+              }
+            }
+          },
+          "serveFetch": {
+            "type": "boolean",
+            "default": true
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["relay", "server"]
+          }
+        }
+      }
+    },
+    "listeners": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trustedForwardedHeaders", "allowedOrigins"],
+      "properties": {
+        "http": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["port"],
+          "properties": {
+            "port": {
+              "type": "integer",
+              "default": 8000
+            },
+            "host": {
+              "type": "string"
+            }
+          }
+        },
+        "https": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["port", "keyPemPath", "certPemPath"],
+          "properties": {
+            "port": {
+              "type": "integer",
+              "default": 8443
+            },
+            "host": {
+              "type": "string"
+            },
+            "keyPemPath": {
+              "type": "string"
+            },
+            "certPemPath": {
+              "type": "string"
+            }
+          }
+        },
+        "ssh": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "port", "hostKeyPath"],
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": false
+            },
+            "port": {
+              "type": "integer",
+              "default": 2222
+            },
+            "hostKeyPath": {
+              "type": "string"
+            }
+          }
+        },
+        "trustedForwardedHeaders": {
+          "type": "boolean",
+          "default": false,
+          "description": "Trust X-Forwarded-* from an ingress. Enable only when the listener is reachable solely through that ingress."
+        },
+        "allowedOrigins": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Browser origins allowed to call the API. Empty means same-origin only."
+        },
+        "serviceUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Public URL used in deferral notices and redirects."
+        }
+      }
+    },
+    "modes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default"],
+      "properties": {
+        "default": {
+          "type": "string",
+          "enum": ["relay", "server"],
+          "default": "relay"
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Bounds applied before any allocation while parsing a push.",
+      "properties": {
+        "maxRequestBytes": {
+          "type": "integer",
+          "default": 1073741824
+        },
+        "maxPktLines": {
+          "type": "integer",
+          "default": 100000
+        },
+        "maxPktLineBytes": {
+          "type": "integer",
+          "default": 65520
+        },
+        "maxPackObjects": {
+          "type": "integer",
+          "default": 1000000
+        },
+        "maxInflatedObjectBytes": {
+          "type": "integer",
+          "default": 134217728
+        },
+        "maxInflatedTotalBytes": {
+          "type": "integer",
+          "default": 4294967296
+        },
+        "maxDiffBytes": {
+          "type": "integer",
+          "default": 10485760
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resolutionMode": {
+          "type": "string",
+          "enum": ["permissive", "strict"],
+          "default": "permissive",
+          "description": "strict accepts only identities attested by an account link."
+        },
+        "attributionPolicy": {
+          "type": "string",
+          "enum": ["off", "warn", "strict"],
+          "default": "warn"
+        },
+        "resolutionCacheSeconds": {
+          "type": "integer",
+          "default": 300
+        }
+      }
+    },
+    "authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Config-sourced records are immutable through the API.",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["username", "roles"],
+            "properties": {
+              "username": {
+                "type": "string"
+              },
+              "roles": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["user", "reviewer", "admin"]
+                }
+              },
+              "emails": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "email"
+                }
+              }
+            }
+          }
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "members"],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "members": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "idpGroup": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "grants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["grant", "target"],
+            "properties": {
+              "grant": {
+                "type": "string",
+                "enum": ["PUSH", "REVIEW", "SELF_CERTIFY", "PUSH_AND_REVIEW", "FETCH"]
+              },
+              "target": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["kind", "match", "value"],
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": ["slug", "owner", "name"],
+                    "description": "Part of the repository identity the pattern is matched against."
+                  },
+                  "match": {
+                    "type": "string",
+                    "enum": ["literal", "glob", "regex"]
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Matched case-insensitively."
+                  }
+                }
+              },
+              "providerId": {
+                "type": "string"
+              },
+              "username": {
+                "type": "string"
+              },
+              "group": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "gateway": {
+          "type": "string",
+          "enum": ["auto", "ui", "external"],
+          "default": "ui"
+        },
+        "external": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["url", "timeoutMs"],
+          "properties": {
+            "url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "timeoutMs": {
+              "type": "integer",
+              "default": 5000
+            }
+          }
+        },
+        "reviewWindowSeconds": {
+          "type": "integer",
+          "default": 2592000
+        },
+        "unconsumedApprovalSeconds": {
+          "type": "integer",
+          "default": 604800
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label"],
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "tooltip": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "links": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "reviewableRules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "couldNotRun": {
+          "type": "string",
+          "enum": ["reject", "defer", "pass-through"],
+          "default": "reject",
+          "description": "Disposition of a check that could not run. Fail-closed by default."
+        },
+        "couldNotRunOverrides": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "enum": ["reject", "defer", "pass-through"]
+          },
+          "default": {}
+        }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "description": "Per-check configuration keyed by check name; each check module documents its shape.",
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
+    "plugins": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "modules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      }
+    },
+    "store": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "dataDirectory"],
+          "properties": {
+            "kind": {
+              "const": "file"
+            },
+            "dataDirectory": {
+              "type": "string",
+              "default": "./.data"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "connectionString", "database"],
+          "properties": {
+            "kind": {
+              "const": "mongo"
+            },
+            "connectionString": {
+              "type": "string"
+            },
+            "database": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "dashboardAuth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["methods", "cookieSecret"],
+      "properties": {
+        "methods": {
+          "type": "array",
+          "description": "Existing local, ActiveDirectory and openidconnect strategy shapes from config.schema.json.",
+          "items": {
+            "$ref": "config.schema.json#/definitions/authenticationElement"
+          }
+        },
+        "jwt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["authorityUrl", "clientId"],
+          "properties": {
+            "authorityUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "clientId": {
+              "type": "string"
+            },
+            "roleMapping": {
+              "type": "object"
+            }
+          }
+        },
+        "cookieSecret": {
+          "type": "string"
+        },
+        "sessionMaxAgeHours": {
+          "type": "integer",
+          "default": 12
+        },
+        "rateLimit": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "windowMs": {
+              "type": "integer",
+              "default": 60000
+            },
+            "limit": {
+              "type": "integer",
+              "default": 150
+            }
+          }
+        }
+      }
+    }
+  }
+}
